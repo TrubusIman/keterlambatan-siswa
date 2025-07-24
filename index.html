@@ -83,10 +83,13 @@
 
     <form id="form-keterlambatan">
       <label for="nama">Nama Siswa</label>
-      <input type="text" name="nama" id="nama" placeholder="Contoh: Budi Santoso" required />
+<select name="nama" id="nama" required>
+  <option value="">Pilih Nama Siswa</option>
+</select>
 
-      <label for="kelas">Kelas</label>
-      <input type="text" name="kelas" id="kelas" placeholder="Contoh: 7A" required />
+<label for="kelas">Kelas</label>
+<input type="text" name="kelas" id="kelas" readonly />
+
 
       <label for="waktu">Waktu Keterlambatan</label>
       <input type="time" name="waktu" id="waktu" required />
@@ -131,3 +134,31 @@
   </script>
 </body>
 </html>
+<script>
+  const dataUrl = "https://script.google.com/macros/s/AKfycbwub5cfJjpdTSGOr-bYC2_2VO4cg2o4wCut47xlwttmoTbF2uRct2sT4vlK6mL205o5/exec";
+
+  // Fetch nama siswa dari Sheet2
+  fetch(dataUrl)
+    .then(res => res.json())
+    .then(data => {
+      const namaSelect = document.getElementById("nama");
+
+      data.forEach(item => {
+        const option = document.createElement("option");
+        option.value = item.nama;
+        option.textContent = item.nama;
+        option.dataset.kelas = item.kelas;
+        namaSelect.appendChild(option);
+      });
+
+      // Isi otomatis kolom kelas saat nama dipilih
+      namaSelect.addEventListener("change", () => {
+        const selected = namaSelect.options[namaSelect.selectedIndex];
+        document.getElementById("kelas").value = selected.dataset.kelas || "";
+      });
+    })
+    .catch(error => {
+      console.error("Gagal mengambil data siswa:", error);
+    });
+</script>
+
