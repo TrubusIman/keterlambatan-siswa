@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Form Keterlambatan Siswa</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 500px;
+      margin: auto;
+      padding: 20px;
+      background-color: #f8f8f8;
+    }
+    h2 {
+      text-align: center;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <h2>Form Keterlambatan Siswa</h2>
+  <form id="form-keterlambatan">
+    <input type="text" name="nama" placeholder="Nama Siswa" required />
+    <input type="text" name="kelas" placeholder="Kelas" required />
+    <input type="time" name="waktu" required />
+    <input type="text" name="alasan" placeholder="Alasan Keterlambatan" />
+    <input type="date" name="tanggal" required />
+    <button type="submit">Kirim</button>
+  </form>
+  <p id="respon" style="margin-top: 15px; text-align: center;"></p>
+
+  <script>
+    const form = document.getElementById("form-keterlambatan");
+    const respon = document.getElementById("respon");
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const data = new FormData(form);
+
+      fetch("https://script.google.com/macros/s/AKfycbwyL2KsNT7eF9uFJ7CetEGqzVYv8gcHHJ8O2a-LDON8oHPbEjp39s1k6Mg3DLd4uVrn/exec", {
+        method: "POST",
+        body: data
+      })
+      .then(response => response.text())
+      .then(text => {
+        respon.innerText = "✅ " + text;
+        form.reset();
+      })
+      .catch(err => {
+        respon.innerText = "❌ Gagal mengirim data. Periksa koneksi atau hubungi admin.";
+        console.error(err);
+      });
+    });
+  </script>
+</body>
+</html>
