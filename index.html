@@ -82,14 +82,16 @@
     <h2>Form Keterlambatan Siswa</h2>
 
     <form id="form-keterlambatan">
+      <label for="search">Cari Nama Siswa</label>
+      <input type="text" id="search" placeholder="Ketik nama siswa..." oninput="filterNama()"/>
+
       <label for="nama">Nama Siswa</label>
-<select name="nama" id="nama" required>
-  <option value="">Pilih Nama Siswa</option>
-</select>
+      <select name="nama" id="nama" required size="5">
+        <option value="">Pilih Nama Siswa</option>
+      </select>
 
-<label for="kelas">Kelas</label>
-<input type="text" name="kelas" id="kelas" readonly />
-
+      <label for="kelas">Kelas</label>
+      <input type="text" name="kelas" id="kelas" readonly />
 
       <label for="waktu">Waktu Keterlambatan</label>
       <input type="time" name="waktu" id="waktu" required />
@@ -131,18 +133,24 @@
         console.error(err);
       });
     });
-  </script>
-</body>
-</html>
-<script>
-  const dataUrl = "https://script.google.com/macros/s/AKfycbwub5cfJjpdTSGOr-bYC2_2VO4cg2o4wCut47xlwttmoTbF2uRct2sT4vlK6mL205o5/exec";
 
-  // Fetch nama siswa dari Sheet2
-  fetch(dataUrl)
-    .then(res => res.json())
-    .then(data => {
+    const dataUrl = "https://script.google.com/macros/s/AKfycbwub5cfJjpdTSGOr-bYC2_2VO4cg2o4wCut47xlwttmoTbF2uRct2sT4vlK6mL205o5/exec";
+    let semuaSiswa = [];
+
+    // Ambil data dari Sheet2
+    fetch(dataUrl)
+      .then(res => res.json())
+      .then(data => {
+        semuaSiswa = data;
+        tampilkanPilihan(semuaSiswa);
+      })
+      .catch(error => {
+        console.error("Gagal mengambil data siswa:", error);
+      });
+
+    function tampilkanPilihan(data) {
       const namaSelect = document.getElementById("nama");
-
+      namaSelect.innerHTML = '<option value="">Pilih Nama Siswa</option>'; // reset
       data.forEach(item => {
         const option = document.createElement("option");
         option.value = item.nama;
@@ -150,15 +158,19 @@
         option.dataset.kelas = item.kelas;
         namaSelect.appendChild(option);
       });
+    }
 
-      // Isi otomatis kolom kelas saat nama dipilih
-      namaSelect.addEventListener("change", () => {
-        const selected = namaSelect.options[namaSelect.selectedIndex];
-        document.getElementById("kelas").value = selected.dataset.kelas || "";
-      });
-    })
-    .catch(error => {
-      console.error("Gagal mengambil data siswa:", error);
+    function filterNama() {
+      const keyword = document.getElementById("search").value.toLowerCase();
+      const hasilFilter = semuaSiswa.filter(s =>
+        s.nama.toLowerCase().includes(keyword)
+      );
+      tampilkanPilihan(hasilFilter);
+    }
+
+    document.getElementById("nama").addEventListener("change", function () {
+      const selected = this.options[this.selectedIndex];
+      document.getElementById("kelas").value = selected.dataset.kelas || "";
     });
-</script>
-
+  </script>
+</body>
