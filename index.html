@@ -109,7 +109,7 @@
     const form = document.getElementById("form-keterlambatan");
     const respon = document.getElementById("respon");
     const rekap = document.getElementById("rekap");
-    const dataUrl = "https://script.google.com/macros/s/AKfycbx-vWzvbMdeGtS4vAd1RYyYsm0SSYq_uOCu_IVLeoHwl0pM8tgNEQV1q5a8zbboLJgc/exec"; // Ganti
+    const dataUrl = "https://script.google.com/macros/s/AKfycbx7dMvGRUCXdLD4wUrC0ic05RC6OzUuvgGuyu-pa4aTdLxpmyoxRFwOOYbOoLA2mVI/exec"; // Ganti
     const rekapUrl = dataUrl; // karena fungsi doGet sama
 
     let semuaSiswa = [];
@@ -168,7 +168,7 @@
       e.preventDefault();
       const data = new FormData(form);
 
-      fetch("https://script.google.com/macros/s/AKfycbx-vWzvbMdeGtS4vAd1RYyYsm0SSYq_uOCu_IVLeoHwl0pM8tgNEQV1q5a8zbboLJgc/exec", {
+      fetch("https://script.google.com/macros/s/AKfycbx7dMvGRUCXdLD4wUrC0ic05RC6OzUuvgGuyu-pa4aTdLxpmyoxRFwOOYbOoLA2mVI/exec", {
         method: "POST",
         body: data
       })
