@@ -11,7 +11,6 @@
       padding: 0;
       margin: 0;
     }
-
     .container {
       max-width: 500px;
       margin: 30px auto;
@@ -20,25 +19,21 @@
       border-radius: 10px;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
     }
-
     .logo {
       display: block;
       margin: 0 auto 10px;
       width: 100px;
     }
-
     h2 {
       text-align: center;
       margin-bottom: 25px;
       color: #2c3e50;
     }
-
     label {
       display: block;
       margin-bottom: 5px;
       font-weight: 500;
     }
-
     input, select, textarea, button {
       width: 100%;
       padding: 10px;
@@ -47,7 +42,6 @@
       border-radius: 6px;
       font-size: 14px;
     }
-
     button {
       background-color: #2ecc71;
       color: white;
@@ -56,18 +50,20 @@
       transition: 0.2s;
       border: none;
     }
-
     button:hover {
       background-color: #27ae60;
     }
-
-    #respon {
+    #respon, #rekap {
       text-align: center;
       font-weight: bold;
       margin-top: 15px;
+    }
+    #rekap {
+      color: #333;
+    }
+    #respon {
       color: green;
     }
-
     @media (max-width: 600px) {
       .container {
         margin: 15px;
@@ -105,52 +101,33 @@
       <button type="submit">Kirim</button>
     </form>
 
+    <p id="rekap"></p>
     <p id="respon"></p>
   </div>
 
   <script>
     const form = document.getElementById("form-keterlambatan");
     const respon = document.getElementById("respon");
+    const rekap = document.getElementById("rekap");
+    const dataUrl = "https://script.google.com/macros/s/AKfycby23U5FBVB6nhGLDVlf2FjPLo1P6uRZCqCTnsxJWDLhLKQHgO4109pgc2CiwWgnLx7z/exec"; // Ganti
+    const rekapUrl = dataUrl; // karena fungsi doGet sama
 
-    form.addEventListener("submit", function(e) {
-      e.preventDefault();
-
-      const data = new FormData(form);
-
-      fetch("https://script.google.com/macros/s/AKfycbzPBu8AZShLXGq00hl7lXrKLXao2_JNGlqD7lswLhzyLVQgN-frIddvG9l9ftd_vk5g/exec", {
-        method: "POST",
-        body: data
-      })
-      .then(response => response.text())
-      .then(text => {
-        respon.innerText = "✅ " + text;
-        respon.style.color = "green";
-        form.reset();
-      })
-      .catch(err => {
-        respon.innerText = "❌ Gagal mengirim data. Periksa koneksi atau hubungi admin.";
-        respon.style.color = "red";
-        console.error(err);
-      });
-    });
-
-    const dataUrl = "https://script.google.com/macros/s/AKfycbwub5cfJjpdTSGOr-bYC2_2VO4cg2o4wCut47xlwttmoTbF2uRct2sT4vlK6mL205o5/exec";
     let semuaSiswa = [];
 
-    // Ambil data dari Sheet2
+    // Fetch daftar nama siswa dari Sheet2
     fetch(dataUrl)
       .then(res => res.json())
       .then(data => {
         semuaSiswa = data;
         tampilkanPilihan(semuaSiswa);
       })
-      .catch(error => {
-        console.error("Gagal mengambil data siswa:", error);
+      .catch(err => {
+        console.error("Gagal mengambil data siswa:", err);
       });
 
     function tampilkanPilihan(data) {
       const namaSelect = document.getElementById("nama");
-      namaSelect.innerHTML = '<option value="">Pilih Nama Siswa</option>'; // reset
+      namaSelect.innerHTML = '<option value="">Pilih Nama Siswa</option>';
       data.forEach(item => {
         const option = document.createElement("option");
         option.value = item.nama;
@@ -162,15 +139,52 @@
 
     function filterNama() {
       const keyword = document.getElementById("search").value.toLowerCase();
-      const hasilFilter = semuaSiswa.filter(s =>
-        s.nama.toLowerCase().includes(keyword)
-      );
-      tampilkanPilihan(hasilFilter);
+      const hasil = semuaSiswa.filter(s => s.nama.toLowerCase().includes(keyword));
+      tampilkanPilihan(hasil);
     }
 
     document.getElementById("nama").addEventListener("change", function () {
       const selected = this.options[this.selectedIndex];
       document.getElementById("kelas").value = selected.dataset.kelas || "";
+
+      const nama = selected.value;
+      if (!nama) return;
+
+      fetch(`${rekapUrl}?nama=${encodeURIComponent(nama)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.jumlah !== undefined) {
+            rekap.textContent = `📌 ${nama} sudah terlambat ${data.jumlah} kali bulan ini.`;
+          } else {
+            rekap.textContent = "❌ Gagal menghitung rekapan.";
+          }
+        })
+        .catch(err => {
+          console.error("Error fetch rekap:", err);
+        });
+    });
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      const data = new FormData(form);
+
+      fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
+        method: "POST",
+        body: data
+      })
+      .then(response => response.text())
+      .then(text => {
+        respon.innerText = "✅ " + text;
+        form.reset();
+        document.getElementById("kelas").value = "";
+        rekap.textContent = "";
+      })
+      .catch(err => {
+        respon.innerText = "❌ Gagal mengirim data.";
+        respon.style.color = "red";
+        console.error(err);
+      });
     });
   </script>
 </body>
+</html>
