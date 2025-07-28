@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: url('https://images.pexels.com/photos/1659294/pexels-photo-1659294.jpeg') no-repeat center center fixed;
+      background: url('https://raw.githubusercontent.com/TrubusIman/keterlambatan-siswa/main/untukbackground.jpeg') no-repeat center center fixed;
       background-size: cover;
       padding: 0;
       margin: 0;
@@ -16,7 +16,7 @@
     .container {
       max-width: 500px;
       margin: 30px auto;
-      background-color: rgba(255, 255, 255, 0.9); /* transparan putih */
+      background-color: rgba(255, 255, 255, 0.9);
       padding: 30px;
       border-radius: 10px;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
@@ -126,7 +126,6 @@
 
     let semuaSiswa = [];
 
-    // Fetch daftar nama siswa
     fetch(dataUrl)
       .then(res => res.json())
       .then(data => {
@@ -153,16 +152,6 @@
       const keyword = document.getElementById("search").value.toLowerCase();
       const hasil = semuaSiswa.filter(s => s.nama.toLowerCase().includes(keyword));
       tampilkanPilihan(hasil);
-
-      const namaSelect = document.getElementById("nama");
-
-      if (hasil.length === 1) {
-        namaSelect.selectedIndex = 1;
-        namaSelect.dispatchEvent(new Event("change"));
-      } else {
-        document.getElementById("kelas").value = "";
-        rekap.textContent = "";
-      }
     }
 
     document.getElementById("nama").addEventListener("change", function () {
