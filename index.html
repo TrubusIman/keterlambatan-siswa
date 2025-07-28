@@ -153,6 +153,16 @@
       const keyword = document.getElementById("search").value.toLowerCase();
       const hasil = semuaSiswa.filter(s => s.nama.toLowerCase().includes(keyword));
       tampilkanPilihan(hasil);
+
+      const namaSelect = document.getElementById("nama");
+
+      if (hasil.length === 1) {
+        namaSelect.selectedIndex = 1;
+        namaSelect.dispatchEvent(new Event("change"));
+      } else {
+        document.getElementById("kelas").value = "";
+        rekap.textContent = "";
+      }
     }
 
     document.getElementById("nama").addEventListener("change", function () {
