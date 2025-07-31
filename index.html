@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>FORM KETERLAMBATAN</title>
+  <link rel="icon" href="https://trubusiman.github.io/keterlambatan-siswa/favicon.ico" type="image/x-icon">
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <style>
     body {
@@ -99,11 +100,8 @@
     <button onclick="mulaiScan()">Scan QR</button>
 
     <form id="form-keterlambatan">
-      <label for="search">Cari Nama Siswa</label>
-      <input type="text" id="search" placeholder="Ketik nama siswa..." oninput="filterNama()"/>
-
       <label for="nama">Nama Siswa</label>
-      <select name="nama" id="nama" required size="5">
+      <select name="nama" id="nama" required>
         <option value="">Pilih Nama Siswa</option>
       </select>
 
@@ -134,7 +132,6 @@
     const rekapUrl = dataUrl;
 
     let semuaSiswa = [];
-    let scanner;
 
     fetch(dataUrl)
       .then(res => res.json())
@@ -156,17 +153,12 @@
       });
     }
 
-    function filterNama() {
-      const keyword = document.getElementById("search").value.toLowerCase();
-      const hasil = semuaSiswa.filter(s => s.nama.toLowerCase().includes(keyword));
-      tampilkanPilihan(hasil);
-    }
-
     document.getElementById("nama").addEventListener("change", function () {
       const selected = this.options[this.selectedIndex];
       document.getElementById("kelas").value = selected.dataset.kelas || "";
 
       const nama = selected.value;
+      const tanggal = document.getElementById("tanggal").value;
       if (!nama) return;
 
       fetch(`${rekapUrl}?nama=${encodeURIComponent(nama)}`)
@@ -185,24 +177,49 @@
 
     form.addEventListener("submit", function(e) {
       e.preventDefault();
-      const data = new FormData(form);
 
-      fetch(dataUrl, {
-        method: "POST",
-        body: data
-      })
-      .then(response => response.text())
-      .then(text => {
-        respon.innerText = "✅ " + text;
-        form.reset();
-        document.getElementById("kelas").value = "";
-        rekap.textContent = "";
-      })
-      .catch(err => {
-        respon.innerText = "❌ Gagal mengirim data.";
+      const data = new FormData(form);
+      const nama = data.get("nama");
+      const tanggal = data.get("tanggal");
+
+      if (!nama || !tanggal) {
+        respon.innerText = "❌ Nama dan tanggal wajib diisi.";
         respon.style.color = "red";
-        console.error(err);
-      });
+        return;
+      }
+
+      fetch(`${rekapUrl}?nama=${encodeURIComponent(nama)}&tanggal=${tanggal}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.sudah_isi) {
+            respon.innerText = `⚠️ ${nama} sudah mengisi keterlambatan hari ini (${tanggal}).`;
+            respon.style.color = "orange";
+            return;
+          }
+
+          fetch(dataUrl, {
+            method: "POST",
+            body: data
+          })
+          .then(response => response.text())
+          .then(text => {
+            respon.innerText = "✅ " + text;
+            respon.style.color = "green";
+            form.reset();
+            document.getElementById("kelas").value = "";
+            rekap.textContent = "";
+          })
+          .catch(err => {
+            respon.innerText = "❌ Gagal mengirim data.";
+            respon.style.color = "red";
+            console.error(err);
+          });
+        })
+        .catch(err => {
+          respon.innerText = "❌ Gagal mengecek data sebelumnya.";
+          respon.style.color = "red";
+          console.error(err);
+        });
     });
 
     function mulaiScan() {
@@ -211,27 +228,20 @@
         const kameraBelakang = cameras.find(cam =>
           cam.label.toLowerCase().includes("back") ||
           cam.label.toLowerCase().includes("environment")
-        ) || cameras[0]; // fallback ke kamera pertama
+        ) || cameras[0];
 
         reader.start(
           kameraBelakang.id,
           { fps: 10, qrbox: 250 },
           qrCodeMessage => {
-            document.getElementById("search").value = qrCodeMessage;
-            filterNama();
-            setTimeout(() => {
-              const options = document.getElementById("nama").options;
-              if (options.length === 2) {
-                options[1].selected = true;
-                document.getElementById("nama").dispatchEvent(new Event("change"));
-              }
-            }, 300);
+            document.getElementById("nama").value = qrCodeMessage;
+            document.getElementById("nama").dispatchEvent(new Event("change"));
             reader.stop().then(() => {
               document.getElementById("reader").innerHTML = "";
             }).catch(console.error);
           },
           error => {
-            // console.warn(`QR Scan error: ${error}`);
+            // console.warn(error);
           }
         );
       }).catch(err => {
