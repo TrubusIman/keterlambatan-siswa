@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Form Keterlambatan Siswa</title>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -76,6 +77,11 @@
       color: green;
     }
 
+    #reader {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
     @media (max-width: 600px) {
       .container {
         margin: 15px;
@@ -88,6 +94,9 @@
   <div class="container">
     <img src="https://trubusiman.github.io/keterlambatan-siswa/IMG_20240513_104401_500.png" alt="Logo Trubus Iman" class="logo">
     <h2>Form Keterlambatan Siswa</h2>
+
+    <div id="reader"></div>
+    <button onclick="mulaiScan()">Scan QR</button>
 
     <form id="form-keterlambatan">
       <label for="search">Cari Nama Siswa</label>
@@ -125,6 +134,7 @@
     const rekapUrl = dataUrl;
 
     let semuaSiswa = [];
+    let scanner;
 
     fetch(dataUrl)
       .then(res => res.json())
@@ -132,9 +142,7 @@
         semuaSiswa = data;
         tampilkanPilihan(semuaSiswa);
       })
-      .catch(err => {
-        console.error("Gagal mengambil data siswa:", err);
-      });
+      .catch(err => console.error("Gagal mengambil data siswa:", err));
 
     function tampilkanPilihan(data) {
       const namaSelect = document.getElementById("nama");
@@ -196,6 +204,41 @@
         console.error(err);
       });
     });
+
+    function mulaiScan() {
+      const reader = new Html5Qrcode("reader");
+      Html5Qrcode.getCameras().then(cameras => {
+        const kameraBelakang = cameras.find(cam =>
+          cam.label.toLowerCase().includes("back") ||
+          cam.label.toLowerCase().includes("environment")
+        ) || cameras[0]; // fallback ke kamera pertama
+
+        reader.start(
+          kameraBelakang.id,
+          { fps: 10, qrbox: 250 },
+          qrCodeMessage => {
+            document.getElementById("search").value = qrCodeMessage;
+            filterNama();
+            setTimeout(() => {
+              const options = document.getElementById("nama").options;
+              if (options.length === 2) {
+                options[1].selected = true;
+                document.getElementById("nama").dispatchEvent(new Event("change"));
+              }
+            }, 300);
+            reader.stop().then(() => {
+              document.getElementById("reader").innerHTML = "";
+            }).catch(console.error);
+          },
+          error => {
+            // console.warn(`QR Scan error: ${error}`);
+          }
+        );
+      }).catch(err => {
+        alert("❌ Tidak bisa mengakses kamera. Pastikan sudah diizinkan.");
+        console.error(err);
+      });
+    }
   </script>
 </body>
 </html>
