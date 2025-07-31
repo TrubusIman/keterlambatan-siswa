@@ -692,6 +692,7 @@
         const kelasInput = document.getElementById("kelas");
         const waktuInput = document.getElementById("waktu");
         const tanggalInput = document.getElementById("tanggal");
+        const alasanInput = document.getElementById("alasan");
         const searchResults = document.getElementById("search-results");
         
         let semuaSiswa = [];
@@ -877,7 +878,7 @@
                 });
         }
 
-        // PERBAIKAN UTAMA: PENGAMBILAN DATA DAN PENCARIAN
+        // Ambil data siswa dari Google Apps Script
         fetch(dataUrl)
             .then(res => {
                 if (!res.ok) {
@@ -920,7 +921,7 @@
                 showMessage("❌ Gagal mengambil data siswa. Coba lagi nanti.", "error");
             });
 
-        // Event listener untuk form submit
+        // PERBAIKAN UTAMA: PENGIRIMAN DATA YANG LEBIH BAIK
         form.addEventListener("submit", function(e) {
             e.preventDefault();
             
@@ -928,34 +929,57 @@
                 return;
             }
             
-            const data = new FormData(form);
-            const nama = data.get("nama");
-            const tanggal = data.get("tanggal");
+            // Membuat objek data untuk dikirim
+            const data = {
+                nama: namaInput.value,
+                kelas: kelasInput.value, // Pastikan kelas disertakan
+                waktu: waktuInput.value,
+                tanggal: tanggalInput.value,
+                alasan: alasanInput.value
+            };
             
-            fetch(`${rekapUrl}?nama=${encodeURIComponent(nama)}&tanggal=${tanggal}`)
+            console.log("Data yang akan dikirim:", data); // Untuk debugging
+            
+            // Cek apakah siswa sudah mengisi hari ini
+            fetch(`${rekapUrl}?nama=${encodeURIComponent(data.nama)}&tanggal=${data.tanggal}`)
                 .then(res => res.json())
-                .then(data => {
-                    if (data.sudah_isi) {
-                        showMessage(`⚠️ ${nama} sudah mengisi keterlambatan hari ini (${tanggal}).`, "warning");
+                .then(checkData => {
+                    if (checkData.sudah_isi) {
+                        showMessage(`⚠️ ${data.nama} sudah mengisi keterlambatan hari ini (${data.tanggal}).`, "warning");
                         return;
+                    }
+                    
+                    // Mengirim data dalam format yang benar
+                    const formData = new URLSearchParams();
+                    for (const key in data) {
+                        formData.append(key, data[key]);
                     }
                     
                     fetch(dataUrl, {
                         method: "POST",
-                        body: data
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: formData
                     })
-                    .then(response => response.text())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Gagal mengirim data');
+                        }
+                        return response.text();
+                    })
                     .then(text => {
                         showSuccessFeedback("✅ " + text);
-                        form.reset();
+                        
+                        // Reset form
+                        alasanInput.value = "";
+                        tanggalInput.value = "";
+                        waktuInput.value = "";
                         hideSelectedStudent();
-                        // Reset tanggal dan waktu
-                        document.getElementById("tanggal").value = "";
-                        document.getElementById("waktu").value = "";
                     })
                     .catch(err => {
                         showMessage("❌ Gagal mengirim data.", "error");
-                        console.error(err);
+                        console.error("Error:", err);
                     });
                 })
                 .catch(err => {
