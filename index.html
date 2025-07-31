@@ -1,142 +1,489 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FORM KETERLAMBATAN</title>
   <link rel="icon" href="https://trubusiman.github.io/keterlambatan-siswa/favicon.ico" sizes="32x32" type="image/x-icon">
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: url('https://raw.githubusercontent.com/TrubusIman/keterlambatan-siswa/main/untukbackground.jpeg') no-repeat center center fixed;
-      background-size: cover;
+    :root {
+      --primary: #3498db;
+      --secondary: #2ecc71;
+      --danger: #e74c3c;
+      --warning: #f39c12;
+      --dark: #2c3e50;
+      --light: #ecf0f1;
+      --gray: #95a5a6;
+      --gold: #D4AF37;
+    }
+    
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
 
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: url('https://raw.githubusercontent.com/TrubusIman/keterlambatan-siswa/main/untukbackground.jpeg') no-repeat center center fixed;
+      background-size: cover;
+      color: #333;
+      line-height: 1.6;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
     .container {
-      max-width: 500px;
-      margin: 30px auto;
-      background-color: rgba(255, 255, 255, 0.95);
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-      backdrop-filter: blur(3px);
+      max-width: 600px;
+      width: 100%;
+      background-color: rgba(255, 255, 255, 0.98);
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(8px);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1a5f7f, #2c3e50);
+      color: white;
+      padding: 25px 30px;
+      text-align: center;
+      position: relative;
+    }
+
+    .logo-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+
+    .logo-frame {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      border: 4px solid white;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      background-color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      margin: 0 auto;
+      overflow: hidden;
     }
 
     .logo {
-      display: block;
-      margin: 0 auto 10px;
-      width: 100px;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
     }
 
     h2 {
-      text-align: center;
-      margin-bottom: 25px;
-      color: #2c3e50;
-      font-size: 24px;
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      margin: 15px 0 0;
       font-weight: 700;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      color: #fff;
+    }
+
+    .content {
+      padding: 30px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    @media (min-width: 576px) {
+      .form-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .form-group {
+      margin-bottom: 20px;
     }
 
     label {
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
       font-weight: 600;
-      color: #34495e;
+      color: var(--dark);
+      font-size: 0.9rem;
+    }
+
+    .input-icon {
+      position: relative;
+    }
+
+    .input-icon i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray);
     }
 
     input, select, textarea, button, datalist {
       width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 14px;
-      transition: all 0.2s ease-in-out;
+      padding: 12px 15px 12px 40px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background-color: white;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+      outline: none;
     }
 
     button {
-      background-color: #2ecc71;
-      color: white;
-      font-weight: bold;
+      padding: 14px;
+      font-weight: 600;
       cursor: pointer;
       border: none;
-      transition: background-color 0.2s ease;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      font-family: 'Poppins', sans-serif;
     }
 
     button:hover {
-      background-color: #27ae60;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      background: linear-gradient(to right, #1a5f7f, #2c3e50);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(to right, #2c3e50, #1a5f7f);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(to right, var(--secondary), #27ae60);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: linear-gradient(to right, #27ae60, var(--secondary));
+    }
+
+    .btn-scan {
+      background: linear-gradient(to right, #8e44ad, #6c3483);
+      color: white;
+      margin-bottom: 20px;
+    }
+
+    .btn-scan:hover {
+      background: linear-gradient(to right, #6c3483, #8e44ad);
+    }
+    
+    .btn-stop {
+      background: linear-gradient(to right, #e74c3c, #c0392b);
+      color: white;
+      margin-bottom: 20px;
+    }
+
+    .btn-stop:hover {
+      background: linear-gradient(to right, #c0392b, #e74c3c);
     }
 
     #respon, #rekap {
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
       text-align: center;
-      font-weight: bold;
-      margin-top: 15px;
-      background-color: #ecf0f1;
-      padding: 10px;
-      border-radius: 6px;
+      font-weight: 600;
+      font-size: 1rem;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      font-family: 'Poppins', sans-serif;
     }
 
     #respon {
-      color: green;
+      background-color: rgba(46, 204, 113, 0.15);
+      border: 2px solid var(--secondary);
+      color: #27ae60;
+    }
+
+    #respon.error {
+      background-color: rgba(231, 76, 60, 0.15);
+      border: 2px solid var(--danger);
+      color: var(--danger);
+    }
+
+    #respon.warning {
+      background-color: rgba(243, 156, 18, 0.15);
+      border: 2px solid var(--warning);
+      color: var(--warning);
+    }
+
+    #rekap {
+      background-color: rgba(52, 152, 219, 0.1);
+      border: 2px solid var(--primary);
+      color: var(--dark);
+    }
+
+    #rekap.high {
+      background-color: rgba(231, 76, 60, 0.1);
+      border: 2px solid var(--danger);
+      color: var(--danger);
     }
 
     #reader {
       width: 100%;
+      height: 300px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      overflow: hidden;
       margin-bottom: 20px;
+      border: 2px dashed #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      display: none; /* Awalnya disembunyikan */
     }
 
-    @media (max-width: 600px) {
-      .container {
-        margin: 15px;
-        padding: 20px;
-      }
+    .qr-placeholder {
+      text-align: center;
+      color: var(--gray);
+      padding: 20px;
+    }
 
-      h2 {
-        font-size: 20px;
-      }
+    .qr-placeholder i {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      color: #ddd;
+    }
 
-      .logo {
-        width: 80px;
-      }
+    .section-title {
+      font-size: 1.2rem;
+      margin: 25px 0 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--light);
+      color: var(--dark);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .hidden {
       display: none;
     }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--dark);
+      font-size: 1.2rem;
+      background: linear-gradient(to right, #1a5f7f, #2c3e50);
+      border-top: 1px solid #eee;
+      font-family: 'Dancing Script', cursive;
+    }
+
+    .footer-text {
+      color: white;
+      font-size: 1.8rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .container {
+        margin: 10px;
+      }
+      
+      .header {
+        padding: 20px 15px;
+      }
+      
+      .content {
+        padding: 20px;
+      }
+      
+      h2 {
+        font-size: 1.8rem;
+      }
+      
+      .logo-frame {
+        width: 110px;
+        height: 110px;
+      }
+      
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+      
+      .footer-text {
+        font-size: 1.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+      
+      .header {
+        padding: 15px 10px;
+      }
+      
+      .content {
+        padding: 15px;
+      }
+      
+      h2 {
+        font-size: 1.5rem;
+      }
+      
+      .logo-frame {
+        width: 100px;
+        height: 100px;
+      }
+      
+      input, select, textarea, button {
+        padding: 12px 12px 12px 38px;
+        font-size: 0.9rem;
+      }
+      
+      .footer-text {
+        font-size: 1.3rem;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <img src="https://trubusiman.github.io/keterlambatan-siswa/IMG_20240513_104401_500.png" alt="Logo Trubus Iman" class="logo">
-    <h2>FORM KETERLAMBATAN</h2>
+    <div class="header">
+      <div class="logo-container">
+        <div class="logo-frame">
+          <img src="https://trubusiman.github.io/keterlambatan-siswa/IMG_20240513_104401_500.png" alt="Logo Trubus Iman" class="logo">
+        </div>
+      </div>
+      <h2>FORM KETERLAMBATAN</h2>
+    </div>
 
-    <div id="reader"></div>
-    <button onclick="mulaiScan()">📷 Scan QR</button>
+    <div class="content">
+      <div class="section-title">
+        <i class="fas fa-qrcode"></i> Scan QR Siswa
+      </div>
+      
+      <div id="reader">
+        <div class="qr-placeholder">
+          <i class="fas fa-camera"></i>
+          <p>Arahkan kamera ke QR Code siswa</p>
+        </div>
+      </div>
+      
+      <div class="button-group">
+        <button class="btn-scan" onclick="mulaiScan()">
+          <i class="fas fa-camera"></i> Mulai Scan QR
+        </button>
+        <button class="btn-stop hidden" onclick="stopScan()">
+          <i class="fas fa-stop-circle"></i> Stop Scan
+        </button>
+      </div>
 
-    <form id="form-keterlambatan">
-      <label for="nama">Cari Nama Siswa</label>
-      <input type="text" id="nama" name="nama" list="daftar-nama" placeholder="Ketik nama siswa..." required>
-      <datalist id="daftar-nama"></datalist>
+      <div class="section-title">
+        <i class="fas fa-edit"></i> Form Keterlambatan
+      </div>
+      
+      <form id="form-keterlambatan">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="nama"><i class="fas fa-user"></i> Cari Nama Siswa</label>
+            <div class="input-icon">
+              <i class="fas fa-search"></i>
+              <input type="text" id="nama" name="nama" list="daftar-nama" placeholder="Ketik nama siswa..." required>
+            </div>
+            <datalist id="daftar-nama"></datalist>
+          </div>
+          
+          <div class="form-group">
+            <label for="kelas"><i class="fas fa-graduation-cap"></i> Kelas</label>
+            <div class="input-icon">
+              <i class="fas fa-chalkboard"></i>
+              <input type="text" name="kelas" id="kelas" readonly />
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="waktu"><i class="fas fa-clock"></i> Waktu Keterlambatan</label>
+            <div class="input-icon">
+              <i class="far fa-clock"></i>
+              <input type="time" name="waktu" id="waktu" required />
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="tanggal"><i class="fas fa-calendar"></i> Tanggal</label>
+            <div class="input-icon">
+              <i class="far fa-calendar"></i>
+              <input type="date" name="tanggal" id="tanggal" required />
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="alasan"><i class="fas fa-comment"></i> Alasan Keterlambatan</label>
+          <div class="input-icon">
+            <i class="fas fa-pen"></i>
+            <input type="text" name="alasan" id="alasan" placeholder="Contoh: Terlambat bangun, hujan, dll" />
+          </div>
+        </div>
+        
+        <button type="submit" class="btn-primary">
+          <i class="fas fa-paper-plane"></i> Kirim Data
+        </button>
+      </form>
 
-      <label for="kelas">Kelas</label>
-      <input type="text" name="kelas" id="kelas" readonly />
-
-      <label for="waktu">Waktu Keterlambatan</label>
-      <input type="time" name="waktu" id="waktu" required />
-
-      <label for="alasan">Alasan Keterlambatan</label>
-      <input type="text" name="alasan" id="alasan" placeholder="Contoh: Terlambat bangun, hujan, dll" />
-
-      <label for="tanggal">Tanggal</label>
-      <input type="date" name="tanggal" id="tanggal" required />
-
-      <button type="submit">Kirim</button>
-    </form>
-
-    <p id="rekap"></p>
-    <p id="respon"></p>
+      <div id="rekap"></div>
+      <div id="respon"></div>
+    </div>
+    
+    <div class="footer">
+      <div class="footer-text">Berfikir Modern, Berakhlak Al-Qur'an</div>
+    </div>
   </div>
 
   <script>
@@ -145,8 +492,22 @@
     const rekap = document.getElementById("rekap");
     const dataUrl = "https://script.google.com/macros/s/AKfycbx7dMvGRUCXdLD4wUrC0ic05RC6OzUuvgGuyu-pa4aTdLxpmyoxRFwOOYbOoLA2mVI/exec";
     const rekapUrl = dataUrl;
+    const scanBtn = document.querySelector('.btn-scan');
+    const stopBtn = document.querySelector('.btn-stop');
 
     let semuaSiswa = [];
+    let html5QrCode = null;
+    
+    // Set tanggal default ke hari ini
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0];
+    document.getElementById("tanggal").value = formattedDate;
+    
+    // Set waktu default ke waktu sekarang
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    document.getElementById("waktu").value = `${hours}:${minutes}`;
 
     fetch(dataUrl)
       .then(res => res.json())
@@ -160,7 +521,10 @@
           datalist.appendChild(option);
         });
       })
-      .catch(err => console.error("Gagal mengambil data siswa:", err));
+      .catch(err => {
+        console.error("Gagal mengambil data siswa:", err);
+        showMessage("❌ Gagal mengambil data siswa. Coba lagi nanti.", "error");
+      });
 
     document.getElementById("nama").addEventListener("input", function () {
       const inputNama = this.value;
@@ -173,17 +537,21 @@
           .then(data => {
             if (data.jumlah !== undefined) {
               rekap.textContent = `📌 ${inputNama} sudah terlambat ${data.jumlah} kali bulan ini.`;
-              rekap.style.color = data.jumlah >= 3 ? "red" : "#333";
+              rekap.className = data.jumlah >= 3 ? "high" : "";
             } else {
               rekap.textContent = "❌ Gagal menghitung rekapan.";
+              rekap.className = "";
             }
           })
           .catch(err => {
             console.error("Error fetch rekap:", err);
+            rekap.textContent = "❌ Gagal mengambil data rekapan.";
+            rekap.className = "";
           });
       } else {
         document.getElementById("kelas").value = "";
         rekap.textContent = "";
+        rekap.className = "";
       }
     });
 
@@ -195,8 +563,7 @@
       const tanggal = data.get("tanggal");
 
       if (!nama || !tanggal) {
-        respon.innerText = "❌ Nama dan tanggal wajib diisi.";
-        respon.style.color = "red";
+        showMessage("❌ Nama dan tanggal wajib diisi.", "error");
         return;
       }
 
@@ -204,8 +571,7 @@
         .then(res => res.json())
         .then(data => {
           if (data.sudah_isi) {
-            respon.innerText = `⚠️ ${nama} sudah mengisi keterlambatan hari ini (${tanggal}).`;
-            respon.style.color = "orange";
+            showMessage(`⚠️ ${nama} sudah mengisi keterlambatan hari ini (${tanggal}).`, "warning");
             return;
           }
 
@@ -215,51 +581,100 @@
           })
           .then(response => response.text())
           .then(text => {
-            respon.innerText = "✅ " + text;
-            respon.style.color = "green";
+            showMessage("✅ " + text, "success");
             form.reset();
             document.getElementById("kelas").value = "";
             rekap.textContent = "";
+            rekap.className = "";
+            
+            // Reset tanggal dan waktu ke nilai default
+            document.getElementById("tanggal").value = formattedDate;
+            document.getElementById("waktu").value = `${hours}:${minutes}`;
           })
           .catch(err => {
-            respon.innerText = "❌ Gagal mengirim data.";
-            respon.style.color = "red";
+            showMessage("❌ Gagal mengirim data.", "error");
             console.error(err);
           });
         })
         .catch(err => {
-          respon.innerText = "❌ Gagal mengecek data sebelumnya.";
-          respon.style.color = "red";
+          showMessage("❌ Gagal mengecek data sebelumnya.", "error");
           console.error(err);
         });
     });
 
     function mulaiScan() {
-      const reader = new Html5Qrcode("reader");
+      // Tampilkan scanner
+      document.getElementById("reader").style.display = "flex";
+      scanBtn.classList.add('hidden');
+      stopBtn.classList.remove('hidden');
+      
+      if (html5QrCode) {
+        // Jika scanner sudah aktif, hentikan dulu
+        html5QrCode.stop().catch(err => console.log("Stop error:", err));
+      }
+      
+      html5QrCode = new Html5Qrcode("reader");
+      
       Html5Qrcode.getCameras().then(cameras => {
-        const kameraBelakang = cameras.find(cam =>
-          cam.label.toLowerCase().includes("back") ||
-          cam.label.toLowerCase().includes("environment")
-        ) || cameras[0];
-
-        reader.start(
-          kameraBelakang.id,
-          { fps: 10, qrbox: 250 },
-          qrCodeMessage => {
-            document.getElementById("nama").value = qrCodeMessage;
-            document.getElementById("nama").dispatchEvent(new Event("input"));
-            reader.stop().then(() => {
-              document.getElementById("reader").innerHTML = "";
-            }).catch(console.error);
-          },
-          error => {
-            // console.warn(error);
-          }
-        );
+        if (cameras && cameras.length > 0) {
+          const kameraBelakang = cameras.find(cam =>
+            cam.label.toLowerCase().includes("back") ||
+            cam.label.toLowerCase().includes("environment")
+          ) || cameras[0];
+          
+          document.querySelector('.qr-placeholder').classList.add('hidden');
+          
+          html5QrCode.start(
+            kameraBelakang.id,
+            { fps: 10, qrbox: 250 },
+            qrCodeMessage => {
+              document.getElementById("nama").value = qrCodeMessage;
+              document.getElementById("nama").dispatchEvent(new Event("input"));
+              
+              // Hentikan scanner setelah berhasil scan
+              stopScan();
+            },
+            error => {
+              // Error handling
+            }
+          );
+        } else {
+          showMessage("❌ Tidak ada kamera yang ditemukan.", "error");
+          stopScan();
+        }
       }).catch(err => {
-        alert("❌ Tidak bisa mengakses kamera. Pastikan sudah diizinkan.");
+        showMessage("❌ Tidak bisa mengakses kamera. Pastikan sudah diizinkan.", "error");
+        stopScan();
         console.error(err);
       });
+    }
+    
+    function stopScan() {
+      if (html5QrCode) {
+        html5QrCode.stop().then(() => {
+          document.getElementById("reader").style.display = "none";
+          document.querySelector('.qr-placeholder').classList.remove('hidden');
+          scanBtn.classList.remove('hidden');
+          stopBtn.classList.add('hidden');
+        }).catch(console.error);
+      } else {
+        document.getElementById("reader").style.display = "none";
+        scanBtn.classList.remove('hidden');
+        stopBtn.classList.add('hidden');
+      }
+    }
+    
+    function showMessage(message, type) {
+      respon.textContent = message;
+      respon.className = type;
+      
+      // Auto-hide success messages after 5 seconds
+      if (type === "success") {
+        setTimeout(() => {
+          respon.textContent = "";
+          respon.className = "";
+        }, 5000);
+      }
     }
   </script>
 </body>
