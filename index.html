@@ -9,7 +9,11 @@
   <style>
     body {
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(to right, #e0f2f1, #a5d6a7);
+      background: linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)),
+                  url('https://i.ibb.co/Hx6cHby/green-arabesque-bg.png');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
       padding: 0;
       margin: 0;
       position: relative;
@@ -18,7 +22,7 @@
     .container {
       max-width: 500px;
       margin: 40px auto;
-      background-color: #ffffff;
+      background-color: #ffffffcc;
       padding: 25px;
       border-radius: 0 0 16px 16px;
       box-shadow: 0 10px 25px rgba(0, 128, 0, 0.15);
@@ -182,6 +186,7 @@
   <div class="container">
     <img src="https://trubusiman.github.io/keterlambatan-siswa/IMG_20240513_104401_500.png" alt="Logo" class="logo">
     <h2>FORM KETERLAMBATAN</h2>
+    <button onclick="startScanner()">Scan QRCode</button>
     <div id="reader"></div>
     <form id="form-keterlambatan">
       <label for="search">Cari Nama Siswa</label>
@@ -230,10 +235,6 @@
         }
       });
     }
-
-    window.addEventListener("load", () => {
-      startScanner();
-    });
   </script>
 </body>
 </html>
