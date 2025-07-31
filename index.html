@@ -2,198 +2,99 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Form Keterlambatan</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Form Keterlambatan Siswa</title>
   <style>
     body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)),
-                  url('https://i.ibb.co/Hx6cHby/green-arabesque-bg.png');
+      font-family: 'Segoe UI', sans-serif;
+      background: url('https://raw.githubusercontent.com/TrubusIman/keterlambatan-siswa/main/untukbackground.jpeg') no-repeat center center fixed;
       background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
       padding: 0;
       margin: 0;
-      position: relative;
     }
 
     .container {
       max-width: 500px;
-      margin: 40px auto;
-      background-color: #ffffffcc;
-      padding: 25px;
-      border-radius: 0 0 16px 16px;
-      box-shadow: 0 10px 25px rgba(0, 128, 0, 0.15);
-      border-top: 6px solid #2e7d32;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .container::before {
-      content: "";
-      position: absolute;
-      top: -80px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 250px solid transparent;
-      border-right: 250px solid transparent;
-      border-bottom: 80px solid #ffffff;
-      z-index: 1;
-    }
-
-    .container::after {
-      content: "";
-      position: absolute;
-      top: -125px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 60px;
-      height: 60px;
-      background: #ffffff;
-      border-radius: 50%;
-      box-shadow: 0 0 0 6px #2e7d32;
-      z-index: 2;
-    }
-
-    .menara {
-      position: absolute;
-      top: -40px;
-      width: 30px;
-      height: 70px;
-      background: #ffffff;
-      border: 3px solid #2e7d32;
-      border-radius: 5px 5px 0 0;
-      z-index: 1;
-    }
-    .menara::after {
-      content: "";
-      position: absolute;
-      top: -20px;
-      left: 5px;
-      width: 20px;
-      height: 20px;
-      background: #ffffff;
-      border-radius: 50%;
-      box-shadow: 0 0 0 3px #2e7d32;
-    }
-    .menara.left {
-      left: 10px;
-    }
-    .menara.right {
-      right: 10px;
+      margin: 30px auto;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
     }
 
     .logo {
       display: block;
-      margin: 40px auto 15px;
-      width: 90px;
-      position: relative;
-      z-index: 3;
+      margin: 0 auto 10px;
+      width: 100px;
     }
 
     h2 {
       text-align: center;
-      margin-bottom: 20px;
-      color: #2e7d32;
-      font-weight: 700;
-      position: relative;
-      z-index: 3;
+      margin-bottom: 25px;
+      color: #2c3e50;
     }
 
     label {
       display: block;
       margin-bottom: 5px;
-      color: #2e7d32;
-      font-weight: 600;
+      font-weight: 500;
     }
 
     input, select, textarea, button {
       width: 100%;
       padding: 10px;
       margin-bottom: 15px;
-      border-radius: 8px;
-      border: 1px solid #b2dfdb;
+      border: 1px solid #ccc;
+      border-radius: 6px;
       font-size: 14px;
     }
 
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: #2e7d32;
-      box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.2);
-    }
-
     button {
-      background-color: #2e7d32;
+      background-color: #2ecc71;
       color: white;
-      font-weight: 600;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
       border: none;
-      transition: background-color 0.2s ease;
     }
 
     button:hover {
-      background-color: #1b5e20;
+      background-color: #27ae60;
     }
 
-    #respon {
+    #respon, #rekap {
       text-align: center;
-      font-weight: 600;
-      color: #388e3c;
+      font-weight: bold;
+      margin-top: 15px;
     }
 
     #rekap {
-      text-align: center;
-      font-weight: 500;
-      color: #004d40;
-      background-color: #e0f7fa;
-      border-radius: 6px;
-      padding: 10px;
-      margin-top: 10px;
+      color: #333;
     }
 
-    .ornament {
-      text-align: center;
-      font-size: 13px;
-      font-style: italic;
-      color: #2e7d32;
-      margin-top: 20px;
-    }
-
-    #reader {
-      width: 100%;
-      margin-top: 10px;
+    #respon {
+      color: green;
     }
 
     @media (max-width: 600px) {
-      .container::before {
-        border-left: 200px solid transparent;
-        border-right: 200px solid transparent;
-        border-bottom: 70px solid #ffffff;
-      }
-      .container::after {
-        width: 50px;
-        height: 50px;
+      .container {
+        margin: 15px;
+        padding: 20px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="menara left"></div>
-  <div class="menara right"></div>
   <div class="container">
-    <img src="https://trubusiman.github.io/keterlambatan-siswa/IMG_20240513_104401_500.png" alt="Logo" class="logo">
-    <h2>FORM KETERLAMBATAN</h2>
-    <button onclick="startScanner()">Scan QRCode</button>
-    <div id="reader"></div>
+    <img src="https://trubusiman.github.io/keterlambatan-siswa/IMG_20240513_104401_500.png" alt="Logo Trubus Iman" class="logo">
+    <h2>Form Keterlambatan Siswa</h2>
+
     <form id="form-keterlambatan">
       <label for="search">Cari Nama Siswa</label>
-      <input type="text" id="search" placeholder="Ketik nama siswa..." oninput="filterNama()" />
+      <input type="text" id="search" placeholder="Ketik nama siswa..." oninput="filterNama()"/>
 
       <label for="nama">Nama Siswa</label>
-      <select name="nama" id="nama" required size="4">
+      <select name="nama" id="nama" required size="5">
         <option value="">Pilih Nama Siswa</option>
       </select>
 
@@ -211,30 +112,90 @@
 
       <button type="submit">Kirim</button>
     </form>
+
     <p id="rekap"></p>
     <p id="respon"></p>
-    <div class="ornament">"Berfikir Modern, Berakhlak Al-Qur'an"</div>
   </div>
-  <script>
-    const html5QrCode = new Html5Qrcode("reader");
 
-    function startScanner() {
-      Html5Qrcode.getCameras().then(devices => {
-        if (devices && devices.length) {
-          const cameraId = devices.find(d => d.label.toLowerCase().includes("back"))?.id || devices[0].id;
-          html5QrCode.start(
-            { deviceId: { exact: cameraId } },
-            { fps: 10, qrbox: 250 },
-            (decodedText, decodedResult) => {
-              document.getElementById("search").value = decodedText;
-              filterNama();
-              html5QrCode.stop();
-            },
-            err => {}
-          );
-        }
+  <script>
+    const form = document.getElementById("form-keterlambatan");
+    const respon = document.getElementById("respon");
+    const rekap = document.getElementById("rekap");
+    const dataUrl = "https://script.google.com/macros/s/AKfycbx7dMvGRUCXdLD4wUrC0ic05RC6OzUuvgGuyu-pa4aTdLxpmyoxRFwOOYbOoLA2mVI/exec";
+    const rekapUrl = dataUrl;
+
+    let semuaSiswa = [];
+
+    fetch(dataUrl)
+      .then(res => res.json())
+      .then(data => {
+        semuaSiswa = data;
+        tampilkanPilihan(semuaSiswa);
+      })
+      .catch(err => {
+        console.error("Gagal mengambil data siswa:", err);
+      });
+
+    function tampilkanPilihan(data) {
+      const namaSelect = document.getElementById("nama");
+      namaSelect.innerHTML = '<option value="">Pilih Nama Siswa</option>';
+      data.forEach(item => {
+        const option = document.createElement("option");
+        option.value = item.nama;
+        option.textContent = item.nama;
+        option.dataset.kelas = item.kelas;
+        namaSelect.appendChild(option);
       });
     }
+
+    function filterNama() {
+      const keyword = document.getElementById("search").value.toLowerCase();
+      const hasil = semuaSiswa.filter(s => s.nama.toLowerCase().includes(keyword));
+      tampilkanPilihan(hasil);
+    }
+
+    document.getElementById("nama").addEventListener("change", function () {
+      const selected = this.options[this.selectedIndex];
+      document.getElementById("kelas").value = selected.dataset.kelas || "";
+
+      const nama = selected.value;
+      if (!nama) return;
+
+      fetch(`${rekapUrl}?nama=${encodeURIComponent(nama)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.jumlah !== undefined) {
+            rekap.textContent = `📌 ${nama} sudah terlambat ${data.jumlah} kali bulan ini.`;
+          } else {
+            rekap.textContent = "❌ Gagal menghitung rekapan.";
+          }
+        })
+        .catch(err => {
+          console.error("Error fetch rekap:", err);
+        });
+    });
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      const data = new FormData(form);
+
+      fetch(dataUrl, {
+        method: "POST",
+        body: data
+      })
+      .then(response => response.text())
+      .then(text => {
+        respon.innerText = "✅ " + text;
+        form.reset();
+        document.getElementById("kelas").value = "";
+        rekap.textContent = "";
+      })
+      .catch(err => {
+        respon.innerText = "❌ Gagal mengirim data.";
+        respon.style.color = "red";
+        console.error(err);
+      });
+    });
   </script>
 </body>
 </html>
