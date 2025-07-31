@@ -608,7 +608,7 @@
             <form id="form-keterlambatan">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="nama"><i class="fas fa-user"></i> Cari Nama Siswa</label>
+                        <label for="cari-siswa"><i class="fas fa-user"></i> Cari Nama Siswa</label>
                         <div class="input-icon">
                             <i class="fas fa-search"></i>
                             <input type="text" id="cari-siswa" placeholder="Ketik nama siswa..." autocomplete="off">
@@ -687,8 +687,9 @@
         const selectedStudentName = document.getElementById("selected-student-name");
         const selectedStudentClass = document.getElementById("selected-student-class");
         const changeStudentBtn = document.getElementById("change-student-btn");
-        const namaInput = document.getElementById("nama");
         const cariSiswaInput = document.getElementById("cari-siswa");
+        const namaInput = document.getElementById("nama");
+        const kelasInput = document.getElementById("kelas");
         const waktuInput = document.getElementById("waktu");
         const tanggalInput = document.getElementById("tanggal");
         const searchResults = document.getElementById("search-results");
@@ -704,6 +705,7 @@
             selectedStudentContainer.classList.remove("hidden");
             cariSiswaInput.disabled = true;
             namaInput.value = nama;
+            kelasInput.value = kelas || "";
         }
 
         // Fungsi untuk menyembunyikan siswa terpilih
@@ -712,7 +714,7 @@
             cariSiswaInput.disabled = false;
             cariSiswaInput.value = "";
             cariSiswaInput.focus();
-            document.getElementById("kelas").value = "";
+            kelasInput.value = "";
             rekap.textContent = "";
             namaInput.value = "";
             selectedStudent = null;
@@ -848,7 +850,6 @@
 
         // Fungsi untuk memilih siswa dari hasil pencarian
         function selectStudent(student) {
-            document.getElementById("kelas").value = student.kelas || "";
             showSelectedStudent(student.nama, student.kelas);
             selectedStudent = student;
             searchResults.style.display = "none";
@@ -896,7 +897,7 @@
                 
                 // Sembunyikan hasil pencarian ketika klik di luar
                 document.addEventListener("click", function(e) {
-                    if (!cariSiswaInput.contains(e.target) {
+                    if (!cariSiswaInput.contains(e.target) && !searchResults.contains(e.target)) {
                         searchResults.style.display = "none";
                     }
                 });
