@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Form Keterlambatan Siswa</title>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -16,7 +17,7 @@
     .container {
       max-width: 500px;
       margin: 30px auto;
-      background-color: rgba(255, 255, 255, 0.9);
+      background-color: rgba(255, 255, 255, 0.95);
       padding: 30px;
       border-radius: 10px;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
@@ -76,6 +77,10 @@
       color: green;
     }
 
+    #reader {
+      margin-top: 10px;
+    }
+
     @media (max-width: 600px) {
       .container {
         margin: 15px;
@@ -88,6 +93,12 @@
   <div class="container">
     <img src="https://trubusiman.github.io/keterlambatan-siswa/IMG_20240513_104401_500.png" alt="Logo Trubus Iman" class="logo">
     <h2>Form Keterlambatan Siswa</h2>
+
+    <!-- Tombol Scan QR dan Reader -->
+    <div style="text-align: center; margin-bottom: 20px;">
+      <button type="button" onclick="startScanner()">📷 Scan QR Siswa</button>
+      <div id="reader" style="width:100%;"></div>
+    </div>
 
     <form id="form-keterlambatan">
       <label for="search">Cari Nama Siswa</label>
@@ -123,8 +134,8 @@
     const rekap = document.getElementById("rekap");
     const dataUrl = "https://script.google.com/macros/s/AKfycbx7dMvGRUCXdLD4wUrC0ic05RC6OzUuvgGuyu-pa4aTdLxpmyoxRFwOOYbOoLA2mVI/exec";
     const rekapUrl = dataUrl;
-
     let semuaSiswa = [];
+    let scanner;
 
     fetch(dataUrl)
       .then(res => res.json())
@@ -196,6 +207,45 @@
         console.error(err);
       });
     });
+
+    function startScanner() {
+      const qrRegion = document.getElementById("reader");
+      qrRegion.innerHTML = ""; // Kosongkan terlebih dulu
+
+      if (scanner) {
+        scanner.clear().catch(() => {});
+      }
+
+      scanner = new Html5Qrcode("reader");
+      Html5Qrcode.getCameras().then(cameras => {
+        if (cameras && cameras.length) {
+          scanner.start(
+            cameras[0].id,
+            { fps: 10, qrbox: 250 },
+            qrCodeMessage => {
+              document.getElementById("search").value = qrCodeMessage;
+              filterNama();
+              setTimeout(() => {
+                const options = document.getElementById("nama").options;
+                if (options.length === 2) {
+                  options[1].selected = true;
+                  document.getElementById("nama").dispatchEvent(new Event("change"));
+                }
+              }, 300);
+              scanner.stop().then(() => {
+                qrRegion.innerHTML = "";
+              }).catch(console.error);
+            },
+            errorMessage => {
+              // opsional: console.log("QR Error:", errorMessage);
+            }
+          );
+        }
+      }).catch(err => {
+        console.error("Tidak bisa mengakses kamera:", err);
+        alert("Tidak dapat mengakses kamera. Pastikan sudah diizinkan.");
+      });
+    }
   </script>
 </body>
 </html>
