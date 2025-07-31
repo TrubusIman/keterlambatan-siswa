@@ -125,6 +125,7 @@
 
         .form-group {
             margin-bottom: 20px;
+            position: relative;
         }
 
         label {
@@ -145,6 +146,7 @@
             top: 50%;
             transform: translateY(-50%);
             color: var(--primary);
+            z-index: 2;
         }
 
         input, select, textarea, button, datalist {
@@ -450,6 +452,47 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
+        /* Hasil pencarian siswa */
+        #search-results {
+            position: absolute;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            display: none;
+            margin-top: -10px;
+        }
+
+        .search-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .search-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .student-name {
+            font-weight: 600;
+        }
+
+        .student-class {
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .container {
@@ -568,9 +611,10 @@
                         <label for="nama"><i class="fas fa-user"></i> Cari Nama Siswa</label>
                         <div class="input-icon">
                             <i class="fas fa-search"></i>
-                            <input type="text" id="nama" name="nama" list="daftar-nama" placeholder="Ketik nama siswa..." required>
+                            <input type="text" id="cari-siswa" placeholder="Ketik nama siswa..." autocomplete="off">
                         </div>
-                        <datalist id="daftar-nama"></datalist>
+                        <div id="search-results"></div>
+                        <input type="hidden" id="nama" name="nama">
                     </div>
                     
                     <div class="form-group">
@@ -644,28 +688,34 @@
         const selectedStudentClass = document.getElementById("selected-student-class");
         const changeStudentBtn = document.getElementById("change-student-btn");
         const namaInput = document.getElementById("nama");
+        const cariSiswaInput = document.getElementById("cari-siswa");
         const waktuInput = document.getElementById("waktu");
         const tanggalInput = document.getElementById("tanggal");
+        const searchResults = document.getElementById("search-results");
         
         let semuaSiswa = [];
         let html5QrCode = null;
+        let selectedStudent = null;
 
         // Fungsi untuk menampilkan siswa terpilih
         function showSelectedStudent(nama, kelas) {
             selectedStudentName.textContent = nama;
             selectedStudentClass.textContent = "Kelas: " + (kelas || "-");
             selectedStudentContainer.classList.remove("hidden");
-            namaInput.disabled = true;
+            cariSiswaInput.disabled = true;
+            namaInput.value = nama;
         }
 
         // Fungsi untuk menyembunyikan siswa terpilih
         function hideSelectedStudent() {
             selectedStudentContainer.classList.add("hidden");
-            namaInput.disabled = false;
-            namaInput.value = "";
-            namaInput.focus();
+            cariSiswaInput.disabled = false;
+            cariSiswaInput.value = "";
+            cariSiswaInput.focus();
             document.getElementById("kelas").value = "";
             rekap.textContent = "";
+            namaInput.value = "";
+            selectedStudent = null;
         }
 
         // Event listener untuk tombol ganti siswa
@@ -748,9 +798,9 @@
         function validateForm() {
             let isValid = true;
             
-            if (!namaInput.value.trim()) {
-                showMessage("❌ Nama siswa wajib diisi", "error");
-                namaInput.focus();
+            if (!namaInput.value) {
+                showMessage("❌ Silakan pilih siswa terlebih dahulu", "error");
+                cariSiswaInput.focus();
                 isValid = false;
             }
             
@@ -769,54 +819,92 @@
             return isValid;
         }
 
+        // Fungsi untuk menampilkan hasil pencarian
+        function showSearchResults(results) {
+            searchResults.innerHTML = "";
+            
+            if (results.length === 0) {
+                searchResults.style.display = "none";
+                return;
+            }
+            
+            results.forEach(student => {
+                const item = document.createElement("div");
+                item.className = "search-item";
+                item.innerHTML = `
+                    <div class="student-name">${student.nama}</div>
+                    <div class="student-class">${student.kelas}</div>
+                `;
+                
+                item.addEventListener("click", () => {
+                    selectStudent(student);
+                });
+                
+                searchResults.appendChild(item);
+            });
+            
+            searchResults.style.display = "block";
+        }
+
+        // Fungsi untuk memilih siswa dari hasil pencarian
+        function selectStudent(student) {
+            document.getElementById("kelas").value = student.kelas || "";
+            showSelectedStudent(student.nama, student.kelas);
+            selectedStudent = student;
+            searchResults.style.display = "none";
+            
+            // Ambil data rekap keterlambatan
+            fetch(`${rekapUrl}?nama=${encodeURIComponent(student.nama)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.jumlah !== undefined) {
+                        rekap.textContent = `📌 ${student.nama} sudah terlambat ${data.jumlah} kali bulan ini.`;
+                        rekap.className = data.jumlah >= 3 ? "high" : "";
+                    } else {
+                        rekap.textContent = "❌ Gagal menghitung rekapan.";
+                        rekap.className = "";
+                    }
+                })
+                .catch(err => {
+                    console.error("Error fetch rekap:", err);
+                    rekap.textContent = "❌ Gagal mengambil data rekapan.";
+                    rekap.className = "";
+                });
+        }
+
         // Ambil data siswa dari Google Apps Script
         fetch(dataUrl)
             .then(res => res.json())
             .then(data => {
                 semuaSiswa = data;
-                const datalist = document.getElementById("daftar-nama");
                 
-                data.forEach(item => {
-                    const option = document.createElement("option");
-                    option.value = item.nama;
-                    option.dataset.kelas = item.kelas;
-                    datalist.appendChild(option);
+                // Event listener untuk pencarian siswa
+                cariSiswaInput.addEventListener("input", function() {
+                    const query = this.value.toLowerCase().trim();
+                    
+                    if (query.length < 2) {
+                        searchResults.style.display = "none";
+                        return;
+                    }
+                    
+                    const results = semuaSiswa.filter(student => 
+                        student.nama.toLowerCase().includes(query)
+                    );
+                    
+                    showSearchResults(results);
+                });
+                
+                // Sembunyikan hasil pencarian ketika klik di luar
+                document.addEventListener("click", function(e) {
+                    if (!cariSiswaInput.contains(e.target) {
+                        searchResults.style.display = "none";
+                    }
                 });
             })
             .catch(err => {
                 console.error("Gagal mengambil data siswa:", err);
                 showMessage("❌ Gagal mengambil data siswa. Coba lagi nanti.", "error");
             });
-
-        // Event listener untuk input nama siswa
-        namaInput.addEventListener("input", function() {
-            const inputNama = this.value;
-            const ditemukan = semuaSiswa.find(s => s.nama === inputNama);
-            
-            if (ditemukan) {
-                document.getElementById("kelas").value = ditemukan.kelas || "";
-                showSelectedStudent(ditemukan.nama, ditemukan.kelas);
-                
-                fetch(`${rekapUrl}?nama=${encodeURIComponent(inputNama)}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.jumlah !== undefined) {
-                            rekap.textContent = `📌 ${inputNama} sudah terlambat ${data.jumlah} kali bulan ini.`;
-                            rekap.className = data.jumlah >= 3 ? "high" : "";
-                        } else {
-                            rekap.textContent = "❌ Gagal menghitung rekapan.";
-                            rekap.className = "";
-                        }
-                    })
-                    .catch(err => {
-                        console.error("Error fetch rekap:", err);
-                        rekap.textContent = "❌ Gagal mengambil data rekapan.";
-                        rekap.className = "";
-                    });
-            } else {
-                hideSelectedStudent();
-            }
-        });
 
         // Event listener untuk form submit
         form.addEventListener("submit", function(e) {
@@ -847,6 +935,9 @@
                         showSuccessFeedback("✅ " + text);
                         form.reset();
                         hideSelectedStudent();
+                        // Reset tanggal dan waktu
+                        document.getElementById("tanggal").value = "";
+                        document.getElementById("waktu").value = "";
                     })
                     .catch(err => {
                         showMessage("❌ Gagal mengirim data.", "error");
@@ -887,8 +978,13 @@
                             qrbox: 250
                         },
                         qrCodeMessage => {
-                            namaInput.value = qrCodeMessage;
-                            namaInput.dispatchEvent(new Event("input"));
+                            // Temukan siswa berdasarkan nama dari QR code
+                            const siswa = semuaSiswa.find(s => s.nama === qrCodeMessage);
+                            if (siswa) {
+                                selectStudent(siswa);
+                            } else {
+                                showMessage("❌ Siswa tidak ditemukan", "error");
+                            }
                             stopScan();
                         },
                         error => {
