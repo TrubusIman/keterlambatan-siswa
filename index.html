@@ -17,7 +17,7 @@
     .container {
       max-width: 500px;
       margin: 30px auto;
-      background-color: rgba(255, 255, 255, 0.95);
+      background-color: rgba(255, 255, 255, 0.9);
       padding: 30px;
       border-radius: 10px;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
@@ -78,7 +78,8 @@
     }
 
     #reader {
-      margin-top: 10px;
+      width: 100%;
+      margin-bottom: 20px;
     }
 
     @media (max-width: 600px) {
@@ -94,12 +95,8 @@
     <img src="https://trubusiman.github.io/keterlambatan-siswa/IMG_20240513_104401_500.png" alt="Logo Trubus Iman" class="logo">
     <h2>Form Keterlambatan Siswa</h2>
 
-    <!-- Tombol Scan QR dan Ganti Kamera -->
-    <div style="text-align: center; margin-bottom: 20px;">
-      <button type="button" onclick="startScanner()">📷 Mulai Scan QR</button>
-      <button type="button" onclick="gantiKamera()">🔄 Ganti Kamera</button>
-      <div id="reader" style="width:100%; margin-top: 10px;"></div>
-    </div>
+    <div id="reader"></div>
+    <button onclick="mulaiScan()">Scan QR</button>
 
     <form id="form-keterlambatan">
       <label for="search">Cari Nama Siswa</label>
@@ -138,8 +135,6 @@
 
     let semuaSiswa = [];
     let scanner;
-    let semuaKamera = [];
-    let indexKameraAktif = 0;
 
     fetch(dataUrl)
       .then(res => res.json())
@@ -147,9 +142,7 @@
         semuaSiswa = data;
         tampilkanPilihan(semuaSiswa);
       })
-      .catch(err => {
-        console.error("Gagal mengambil data siswa:", err);
-      });
+      .catch(err => console.error("Gagal mengambil data siswa:", err));
 
     function tampilkanPilihan(data) {
       const namaSelect = document.getElementById("nama");
@@ -212,49 +205,16 @@
       });
     });
 
-    function startScanner() {
-      const qrRegion = document.getElementById("reader");
-      qrRegion.innerHTML = "";
-
-      if (scanner) {
-        scanner.clear().catch(() => {});
-      }
-
-      scanner = new Html5Qrcode("reader");
-
+    function mulaiScan() {
+      const reader = new Html5Qrcode("reader");
       Html5Qrcode.getCameras().then(cameras => {
-        semuaKamera = cameras;
-        if (cameras.length === 0) {
-          alert("Tidak ada kamera ditemukan.");
-          return;
-        }
+        const kameraBelakang = cameras.find(cam =>
+          cam.label.toLowerCase().includes("back") ||
+          cam.label.toLowerCase().includes("environment")
+        ) || cameras[0]; // fallback ke kamera pertama
 
-        indexKameraAktif = 0;
-        jalankanScannerDenganKameraAktif();
-      }).catch(err => {
-        console.error("Tidak bisa akses kamera:", err);
-        alert("Pastikan browser diizinkan akses kamera.");
-      });
-    }
-
-    function gantiKamera() {
-      if (!semuaKamera.length) return;
-      indexKameraAktif = (indexKameraAktif + 1) % semuaKamera.length;
-      jalankanScannerDenganKameraAktif();
-    }
-
-    function jalankanScannerDenganKameraAktif() {
-      const qrRegion = document.getElementById("reader");
-      qrRegion.innerHTML = "";
-
-      if (!scanner) {
-        scanner = new Html5Qrcode("reader");
-      }
-
-      scanner.stop().catch(() => {}).finally(() => {
-        const kameraId = semuaKamera[indexKameraAktif].id;
-        scanner.start(
-          kameraId,
+        reader.start(
+          kameraBelakang.id,
           { fps: 10, qrbox: 250 },
           qrCodeMessage => {
             document.getElementById("search").value = qrCodeMessage;
@@ -266,14 +226,17 @@
                 document.getElementById("nama").dispatchEvent(new Event("change"));
               }
             }, 300);
-            scanner.stop().then(() => {
-              qrRegion.innerHTML = "";
+            reader.stop().then(() => {
+              document.getElementById("reader").innerHTML = "";
             }).catch(console.error);
           },
-          errorMessage => {
-            // opsional: console.log("Scan error:", errorMessage);
+          error => {
+            // console.warn(`QR Scan error: ${error}`);
           }
         );
+      }).catch(err => {
+        alert("❌ Tidak bisa mengakses kamera. Pastikan sudah diizinkan.");
+        console.error(err);
       });
     }
   </script>
