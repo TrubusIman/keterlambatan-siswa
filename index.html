@@ -367,36 +367,50 @@
             100% { transform: scale(1); }
         }
 
-        @keyframes confetti {
-            0% { transform: translateY(0) rotate(0); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        /* Loading spinner */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-
-        .success-animation {
-            animation: successPulse 1s ease-in-out;
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
         }
-
-        .confetti-container {
+        
+        .loading-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
-            z-index: 1000;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
             display: none;
         }
-
-        .confetti {
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            border-radius: 2px;
-            animation: confetti 3s ease-in-out forwards;
+        
+        .loading-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
         }
-
-        .success-sound {
-            display: none;
+        
+        .loading-text {
+            margin-top: 15px;
+            font-weight: 600;
+            color: var(--primary);
         }
 
         /* Tampilan siswa terpilih */
@@ -567,6 +581,13 @@
         </div>
         
         <div class="content">
+            <div class="loading-overlay" id="loading-overlay">
+                <div class="loading-content">
+                    <div class="spinner"></div>
+                    <div class="loading-text">Mengirim data keterlambatan...</div>
+                </div>
+            </div>
+            
             <div class="section-title">
                 <i class="fas fa-qrcode"></i> Scan QR Siswa
             </div>
@@ -652,7 +673,7 @@
                     </div>
                 </div>
                 
-                <button type="submit" class="btn-primary">
+                <button type="submit" class="btn-primary" id="submit-btn">
                     <i class="fas fa-paper-plane"></i> Kirim Data
                 </button>
             </form>
@@ -666,9 +687,6 @@
         </div>
     </div>
 
-    <!-- Confetti container for success animation -->
-    <div id="confetti-container" class="confetti-container"></div>
-    
     <!-- Success sound -->
     <audio id="success-sound" class="success-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3"></audio>
 
@@ -677,7 +695,6 @@
         const form = document.getElementById("form-keterlambatan");
         const respon = document.getElementById("respon");
         const rekap = document.getElementById("rekap");
-        const confettiContainer = document.getElementById("confetti-container");
         const successSound = document.getElementById("success-sound");
         const dataUrl = "https://script.google.com/macros/s/AKfycbx7dMvGRUCXdLD4wUrC0ic05RC6OzUuvgGuyu-pa4aTdLxpmyoxRFwOOYbOoLA2mVI/exec";
         const rekapUrl = dataUrl;
@@ -694,11 +711,32 @@
         const tanggalInput = document.getElementById("tanggal");
         const alasanInput = document.getElementById("alasan");
         const searchResults = document.getElementById("search-results");
+        const loadingOverlay = document.getElementById("loading-overlay");
+        const submitBtn = document.getElementById("submit-btn");
         
         let semuaSiswa = [];
         let html5QrCode = null;
         let selectedStudent = null;
 
+        // Set tanggal hari ini sebagai default
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0];
+        tanggalInput.value = formattedDate;
+        
+        // Fungsi untuk menampilkan loading
+        function showLoading() {
+            loadingOverlay.style.display = "flex";
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<div class="spinner"></div> Mengirim...';
+        }
+        
+        // Fungsi untuk menyembunyikan loading
+        function hideLoading() {
+            loadingOverlay.style.display = "none";
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Kirim Data';
+        }
+        
         // Fungsi untuk menampilkan siswa terpilih
         function showSelectedStudent(nama, kelas) {
             selectedStudentName.textContent = nama;
@@ -737,37 +775,11 @@
             }
         }
 
-        // Fungsi untuk membuat efek konfeti
-        function createConfetti() {
-            confettiContainer.style.display = 'block';
-            const colors = ['#27ae60', '#2ecc71', '#3498db', '#9b59b6', '#f1c40f', '#e74c3c'];
-            
-            for (let i = 0; i < 100; i++) {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti';
-                confetti.style.left = Math.random() * 100 + 'vw';
-                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
-                confettiContainer.appendChild(confetti);
-                
-                setTimeout(() => {
-                    confetti.remove();
-                }, 5000);
-            }
-            
-            setTimeout(() => {
-                confettiContainer.style.display = 'none';
-                confettiContainer.innerHTML = '';
-            }, 5000);
-        }
-
-        // Fungsi untuk menampilkan feedback sukses
+        // Fungsi untuk menampilkan feedback sukses (tanpa konfeti)
         function showSuccessFeedback(message) {
             respon.textContent = message;
             respon.className = "success";
-            respon.classList.add("success-animation");
             
-            createConfetti();
             playSuccessSound();
             
             const submitBtn = document.querySelector('.btn-primary');
@@ -921,7 +933,7 @@
                 showMessage("❌ Gagal mengambil data siswa. Coba lagi nanti.", "error");
             });
 
-        // PERBAIKAN UTAMA: PENGIRIMAN DATA YANG LEBIH BAIK
+        // Pengiriman data form
         form.addEventListener("submit", function(e) {
             e.preventDefault();
             
@@ -932,19 +944,23 @@
             // Membuat objek data untuk dikirim
             const data = {
                 nama: namaInput.value,
-                kelas: kelasInput.value, // Pastikan kelas disertakan
+                kelas: kelasInput.value,
                 waktu: waktuInput.value,
                 tanggal: tanggalInput.value,
                 alasan: alasanInput.value
             };
             
-            console.log("Data yang akan dikirim:", data); // Untuk debugging
+            console.log("Data yang akan dikirim:", data);
+            
+            // Tampilkan loading indicator
+            showLoading();
             
             // Cek apakah siswa sudah mengisi hari ini
             fetch(`${rekapUrl}?nama=${encodeURIComponent(data.nama)}&tanggal=${data.tanggal}`)
                 .then(res => res.json())
                 .then(checkData => {
                     if (checkData.sudah_isi) {
+                        hideLoading();
                         showMessage(`⚠️ ${data.nama} sudah mengisi keterlambatan hari ini (${data.tanggal}).`, "warning");
                         return;
                     }
@@ -969,20 +985,21 @@
                         return response.text();
                     })
                     .then(text => {
+                        hideLoading();
                         showSuccessFeedback("✅ " + text);
                         
                         // Reset form
                         alasanInput.value = "";
-                        tanggalInput.value = "";
-                        waktuInput.value = "";
                         hideSelectedStudent();
                     })
                     .catch(err => {
+                        hideLoading();
                         showMessage("❌ Gagal mengirim data.", "error");
                         console.error("Error:", err);
                     });
                 })
                 .catch(err => {
+                    hideLoading();
                     showMessage("❌ Gagal mengecek data sebelumnya.", "error");
                     console.error(err);
                 });
