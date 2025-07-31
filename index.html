@@ -10,15 +10,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #0d2e14; /* Hijau tua lebih gelap */
-      --secondary: #1d5d3a; /* Hijau sedang */
-      --accent: #4a9c5f; /* Hijau muda */
-      --gold: #c9a145; /* Emas islami */
-      --dark: #0a180b; /* Hijau sangat tua */
+      --primary: #0d2e14;
+      --secondary: #1d5d3a;
+      --accent: #4a9c5f;
+      --gold: #c9a145;
+      --dark: #0a180b;
       --light: #ecf0f1;
       --gray: #95a5a6;
       --danger: #e74c3c;
       --warning: #f39c12;
+      --success: #27ae60;
     }
     
     * {
@@ -262,6 +263,12 @@
       color: var(--warning);
     }
 
+    #respon.success {
+      background-color: rgba(39, 174, 96, 0.25);
+      border: 2px solid var(--success);
+      color: var(--success);
+    }
+
     #rekap {
       background-color: rgba(13, 46, 20, 0.1);
       border: 2px solid var(--primary);
@@ -354,6 +361,45 @@
       top: 0;
       left: 0;
       opacity: 0.7;
+    }
+
+    /* Animasi untuk feedback sukses */
+    @keyframes successPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); box-shadow: 0 0 20px rgba(39, 174, 96, 0.7); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes confetti {
+      0% { transform: translateY(0) rotate(0); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+
+    .success-animation {
+      animation: successPulse 1s ease-in-out;
+    }
+
+    .confetti-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+      display: none;
+    }
+
+    .confetti {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      animation: confetti 3s ease-in-out forwards;
+    }
+
+    .success-sound {
+      display: none;
     }
 
     /* Responsive adjustments */
@@ -524,10 +570,20 @@
     </div>
   </div>
 
+  <!-- Container untuk efek konfeti -->
+  <div class="confetti-container" id="confetti-container"></div>
+  
+  <!-- Audio untuk suara sukses -->
+  <audio id="success-sound" preload="auto">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-magic-sparkles-3003.mp3" type="audio/mpeg">
+  </audio>
+
   <script>
     const form = document.getElementById("form-keterlambatan");
     const respon = document.getElementById("respon");
     const rekap = document.getElementById("rekap");
+    const confettiContainer = document.getElementById("confetti-container");
+    const successSound = document.getElementById("success-sound");
     const dataUrl = "https://script.google.com/macros/s/AKfycbx7dMvGRUCXdLD4wUrC0ic05RC6OzUuvgGuyu-pa4aTdLxpmyoxRFwOOYbOoLA2mVI/exec";
     const rekapUrl = dataUrl;
     const scanBtn = document.querySelector('.btn-scan');
@@ -546,6 +602,71 @@
     const hours = now.getHours().toString().padStart(2, '0');
     const minutes = now.getMinutes().toString().padStart(2, '0');
     document.getElementById("waktu").value = `${hours}:${minutes}`;
+
+    // Fungsi untuk memutar suara sukses
+    function playSuccessSound() {
+      try {
+        successSound.currentTime = 0; // Reset audio ke awal
+        successSound.play();
+      } catch (e) {
+        console.log("Gagal memutar suara:", e);
+      }
+    }
+
+    // Fungsi untuk membuat efek konfeti
+    function createConfetti() {
+      confettiContainer.style.display = 'block';
+      const colors = ['#27ae60', '#2ecc71', '#3498db', '#9b59b6', '#f1c40f', '#e74c3c'];
+      
+      for (let i = 0; i < 100; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        confettiContainer.appendChild(confetti);
+        
+        // Hapus konfeti setelah animasi selesai
+        setTimeout(() => {
+          confetti.remove();
+        }, 5000);
+      }
+      
+      // Sembunyikan container setelah animasi selesai
+      setTimeout(() => {
+        confettiContainer.style.display = 'none';
+        confettiContainer.innerHTML = '';
+      }, 5000);
+    }
+
+    // Fungsi untuk menampilkan feedback sukses
+    function showSuccessFeedback(message) {
+      // Animasi visual
+      respon.textContent = message;
+      respon.className = "success";
+      respon.classList.add("success-animation");
+      
+      // Efek konfeti
+      createConfetti();
+      
+      // Suara sukses
+      playSuccessSound();
+      
+      // Animasi pada tombol kirim
+      const submitBtn = document.querySelector('.btn-primary');
+      submitBtn.classList.add('success-animation');
+      setTimeout(() => {
+        submitBtn.classList.remove('success-animation');
+      }, 1000);
+      
+      // Auto-hide pesan setelah 5 detik
+      setTimeout(() => {
+        if (respon.textContent === message) {
+          respon.textContent = "";
+          respon.className = "";
+        }
+      }, 5000);
+    }
 
     fetch(dataUrl)
       .then(res => res.json())
@@ -619,7 +740,8 @@
           })
           .then(response => response.text())
           .then(text => {
-            showMessage("✅ " + text, "success");
+            // Menggunakan feedback sukses baru
+            showSuccessFeedback("✅ " + text);
             form.reset();
             document.getElementById("kelas").value = "";
             rekap.textContent = "";
@@ -706,8 +828,8 @@
       respon.textContent = message;
       respon.className = type;
       
-      // Auto-hide success messages after 5 seconds
-      if (type === "success") {
+      // Auto-hide pesan setelah 5 detik
+      if (type === "success" || type === "warning") {
         setTimeout(() => {
           respon.textContent = "";
           respon.className = "";
