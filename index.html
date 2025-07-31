@@ -4,24 +4,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>FORM KETERLAMBATAN</title>
-  <link rel="icon" href="https://trubusiman.github.io/keterlambatan-siswa/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="https://trubusiman.github.io/keterlambatan-siswa/favicon.ico" sizes="32x32" type="image/x-icon">
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
       background: url('https://raw.githubusercontent.com/TrubusIman/keterlambatan-siswa/main/untukbackground.jpeg') no-repeat center center fixed;
       background-size: cover;
-      padding: 0;
       margin: 0;
+      padding: 0;
     }
 
     .container {
       max-width: 500px;
       margin: 30px auto;
-      background-color: rgba(255, 255, 255, 0.9);
+      background-color: rgba(255, 255, 255, 0.95);
       padding: 30px;
       border-radius: 10px;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(3px);
     }
 
     .logo {
@@ -34,21 +35,25 @@
       text-align: center;
       margin-bottom: 25px;
       color: #2c3e50;
+      font-size: 24px;
+      font-weight: 700;
     }
 
     label {
       display: block;
       margin-bottom: 5px;
-      font-weight: 500;
+      font-weight: 600;
+      color: #34495e;
     }
 
-    input, select, textarea, button {
+    input, select, textarea, button, datalist {
       width: 100%;
       padding: 10px;
       margin-bottom: 15px;
       border: 1px solid #ccc;
       border-radius: 6px;
       font-size: 14px;
+      transition: all 0.2s ease-in-out;
     }
 
     button {
@@ -56,8 +61,8 @@
       color: white;
       font-weight: bold;
       cursor: pointer;
-      transition: 0.2s;
       border: none;
+      transition: background-color 0.2s ease;
     }
 
     button:hover {
@@ -68,10 +73,9 @@
       text-align: center;
       font-weight: bold;
       margin-top: 15px;
-    }
-
-    #rekap {
-      color: #333;
+      background-color: #ecf0f1;
+      padding: 10px;
+      border-radius: 6px;
     }
 
     #respon {
@@ -88,6 +92,18 @@
         margin: 15px;
         padding: 20px;
       }
+
+      h2 {
+        font-size: 20px;
+      }
+
+      .logo {
+        width: 80px;
+      }
+    }
+
+    .hidden {
+      display: none;
     }
   </style>
 </head>
@@ -97,13 +113,12 @@
     <h2>FORM KETERLAMBATAN</h2>
 
     <div id="reader"></div>
-    <button onclick="mulaiScan()">Scan QR</button>
+    <button onclick="mulaiScan()">📷 Scan QR</button>
 
     <form id="form-keterlambatan">
-      <label for="nama">Nama Siswa</label>
-      <select name="nama" id="nama" required>
-        <option value="">Pilih Nama Siswa</option>
-      </select>
+      <label for="nama">Cari Nama Siswa</label>
+      <input type="text" id="nama" name="nama" list="daftar-nama" placeholder="Ketik nama siswa..." required>
+      <datalist id="daftar-nama"></datalist>
 
       <label for="kelas">Kelas</label>
       <input type="text" name="kelas" id="kelas" readonly />
@@ -137,42 +152,39 @@
       .then(res => res.json())
       .then(data => {
         semuaSiswa = data;
-        tampilkanPilihan(semuaSiswa);
+        const datalist = document.getElementById("daftar-nama");
+        data.forEach(item => {
+          const option = document.createElement("option");
+          option.value = item.nama;
+          option.dataset.kelas = item.kelas;
+          datalist.appendChild(option);
+        });
       })
       .catch(err => console.error("Gagal mengambil data siswa:", err));
 
-    function tampilkanPilihan(data) {
-      const namaSelect = document.getElementById("nama");
-      namaSelect.innerHTML = '<option value="">Pilih Nama Siswa</option>';
-      data.forEach(item => {
-        const option = document.createElement("option");
-        option.value = item.nama;
-        option.textContent = item.nama;
-        option.dataset.kelas = item.kelas;
-        namaSelect.appendChild(option);
-      });
-    }
+    document.getElementById("nama").addEventListener("input", function () {
+      const inputNama = this.value;
+      const ditemukan = semuaSiswa.find(s => s.nama === inputNama);
+      if (ditemukan) {
+        document.getElementById("kelas").value = ditemukan.kelas || "";
 
-    document.getElementById("nama").addEventListener("change", function () {
-      const selected = this.options[this.selectedIndex];
-      document.getElementById("kelas").value = selected.dataset.kelas || "";
-
-      const nama = selected.value;
-      const tanggal = document.getElementById("tanggal").value;
-      if (!nama) return;
-
-      fetch(`${rekapUrl}?nama=${encodeURIComponent(nama)}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.jumlah !== undefined) {
-            rekap.textContent = `📌 ${nama} sudah terlambat ${data.jumlah} kali bulan ini.`;
-          } else {
-            rekap.textContent = "❌ Gagal menghitung rekapan.";
-          }
-        })
-        .catch(err => {
-          console.error("Error fetch rekap:", err);
-        });
+        fetch(`${rekapUrl}?nama=${encodeURIComponent(inputNama)}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.jumlah !== undefined) {
+              rekap.textContent = `📌 ${inputNama} sudah terlambat ${data.jumlah} kali bulan ini.`;
+              rekap.style.color = data.jumlah >= 3 ? "red" : "#333";
+            } else {
+              rekap.textContent = "❌ Gagal menghitung rekapan.";
+            }
+          })
+          .catch(err => {
+            console.error("Error fetch rekap:", err);
+          });
+      } else {
+        document.getElementById("kelas").value = "";
+        rekap.textContent = "";
+      }
     });
 
     form.addEventListener("submit", function(e) {
@@ -235,7 +247,7 @@
           { fps: 10, qrbox: 250 },
           qrCodeMessage => {
             document.getElementById("nama").value = qrCodeMessage;
-            document.getElementById("nama").dispatchEvent(new Event("change"));
+            document.getElementById("nama").dispatchEvent(new Event("input"));
             reader.stop().then(() => {
               document.getElementById("reader").innerHTML = "";
             }).catch(console.error);
