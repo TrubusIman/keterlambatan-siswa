@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Form Keterlambatan Siswa</title>
+  <title>Form Keterlambatan</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -157,6 +158,11 @@
       margin-top: 20px;
     }
 
+    #reader {
+      width: 100%;
+      margin-top: 10px;
+    }
+
     @media (max-width: 600px) {
       .container::before {
         border-left: 200px solid transparent;
@@ -175,7 +181,8 @@
   <div class="menara right"></div>
   <div class="container">
     <img src="https://trubusiman.github.io/keterlambatan-siswa/IMG_20240513_104401_500.png" alt="Logo" class="logo">
-    <h2>Form Keterlambatan Siswa</h2>
+    <h2>FORM KETERLAMBATAN</h2>
+    <div id="reader"></div>
     <form id="form-keterlambatan">
       <label for="search">Cari Nama Siswa</label>
       <input type="text" id="search" placeholder="Ketik nama siswa..." oninput="filterNama()" />
@@ -203,5 +210,30 @@
     <p id="respon"></p>
     <div class="ornament">"Berfikir Modern, Berakhlak Al-Qur'an"</div>
   </div>
+  <script>
+    const html5QrCode = new Html5Qrcode("reader");
+
+    function startScanner() {
+      Html5Qrcode.getCameras().then(devices => {
+        if (devices && devices.length) {
+          const cameraId = devices.find(d => d.label.toLowerCase().includes("back"))?.id || devices[0].id;
+          html5QrCode.start(
+            { deviceId: { exact: cameraId } },
+            { fps: 10, qrbox: 250 },
+            (decodedText, decodedResult) => {
+              document.getElementById("search").value = decodedText;
+              filterNama();
+              html5QrCode.stop();
+            },
+            err => {}
+          );
+        }
+      });
+    }
+
+    window.addEventListener("load", () => {
+      startScanner();
+    });
+  </script>
 </body>
 </html>
