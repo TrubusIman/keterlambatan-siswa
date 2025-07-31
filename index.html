@@ -73,7 +73,6 @@
 <h1>Form Keterlambatan Siswa</h1>
 
 <form id="lateForm">
-  <!-- Pilih nama dari daftar -->
   <label for="nama">Nama Siswa</label>
   <input type="text" id="nama" name="nama" list="daftar-nama" placeholder="Ketik nama siswa..." required />
 
@@ -81,7 +80,7 @@
     <option value="ADIBA ADZKIA INARA" data-kelas="7A">
     <option value="ALYA AMIRA FAKHIRA" data-kelas="7A">
     <option value="ILHAM RAIHAN" data-kelas="7B">
-    <!-- Tambahkan nama-nama lainnya sesuai kebutuhan -->
+    <!-- Tambahkan nama lainnya -->
   </datalist>
 
   <div id="selected-student" class="hidden">
@@ -116,7 +115,6 @@
   const selectedStudentClass = document.getElementById("selected-kelas");
   const messageBox = document.getElementById("message");
 
-  // Saat memilih dari datalist
   namaInput.addEventListener("change", () => {
     const nama = namaInput.value.trim();
     const option = [...document.querySelectorAll("#daftar-nama option")].find(o => o.value === nama);
@@ -157,8 +155,7 @@
     }
 
     try {
-      // Ganti URL di bawah dengan URL Web Apps dari Google Apps Script Anda
-      const response = await fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
+      const response = await fetch("https://script.google.com/macros/s/AKfycbw0p7ELOZDe9NIsuw7r9FY2EQDFeSxyS2znNwQyW5dOloVX1Z0Y1Y9PWLsOiC4dJ9oF/exec", {
         method: "POST",
         body: formData,
       });
