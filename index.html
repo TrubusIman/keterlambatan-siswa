@@ -10,14 +10,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #3498db;
-      --secondary: #2ecc71;
-      --danger: #e74c3c;
-      --warning: #f39c12;
-      --dark: #2c3e50;
+      --primary: #0d2e14; /* Hijau tua lebih gelap */
+      --secondary: #1d5d3a; /* Hijau sedang */
+      --accent: #4a9c5f; /* Hijau muda */
+      --gold: #c9a145; /* Emas islami */
+      --dark: #0a180b; /* Hijau sangat tua */
       --light: #ecf0f1;
       --gray: #95a5a6;
-      --gold: #D4AF37;
+      --danger: #e74c3c;
+      --warning: #f39c12;
     }
     
     * {
@@ -28,8 +29,10 @@
 
     body {
       font-family: 'Poppins', sans-serif;
-      background: url('https://raw.githubusercontent.com/TrubusIman/keterlambatan-siswa/main/untukbackground.jpeg') no-repeat center center fixed;
-      background-size: cover;
+      background: 
+        linear-gradient(rgba(10, 24, 11, 0.92), rgba(10, 24, 11, 0.92)),
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%230a180b"/><path d="M20,20 Q50,0 80,20 Q100,50 80,80 Q50,100 20,80 Q0,50 20,20 Z" fill="none" stroke="%231d5d3a" stroke-width="1" opacity="0.3"/><path d="M30,30 Q50,15 70,30 Q85,50 70,70 Q50,85 30,70 Q15,50 30,30 Z" fill="none" stroke="%230d2e14" stroke-width="1" opacity="0.2"/><circle cx="50" cy="50" r="15" fill="none" stroke="%234a9c5f" stroke-width="0.8" opacity="0.1"/></svg>');
+      background-size: 300px;
       color: #333;
       line-height: 1.6;
       padding: 20px;
@@ -42,20 +45,21 @@
     .container {
       max-width: 600px;
       width: 100%;
-      background-color: rgba(255, 255, 255, 0.98);
+      background-color: rgba(255, 255, 255, 0.95);
       border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-      backdrop-filter: blur(8px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
       overflow: hidden;
       position: relative;
+      border: 1px solid var(--gold);
     }
 
     .header {
-      background: linear-gradient(135deg, #1a5f7f, #2c3e50);
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
       color: white;
       padding: 25px 30px;
       text-align: center;
       position: relative;
+      border-bottom: 3px solid var(--gold);
     }
 
     .logo-container {
@@ -68,8 +72,8 @@
       width: 130px;
       height: 130px;
       border-radius: 50%;
-      border: 4px solid white;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      border: 4px solid var(--gold);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
       background-color: white;
       display: flex;
       justify-content: center;
@@ -93,6 +97,17 @@
       letter-spacing: 1px;
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
       color: #fff;
+      position: relative;
+    }
+
+    h2::after {
+      content: "";
+      display: block;
+      width: 80px;
+      height: 3px;
+      background: var(--gold);
+      margin: 10px auto 0;
+      border-radius: 2px;
     }
 
     .content {
@@ -119,7 +134,7 @@
       display: block;
       margin-bottom: 8px;
       font-weight: 600;
-      color: var(--dark);
+      color: var(--primary);
       font-size: 0.9rem;
     }
 
@@ -132,7 +147,7 @@
       left: 12px;
       top: 50%;
       transform: translateY(-50%);
-      color: var(--gray);
+      color: var(--primary);
     }
 
     input, select, textarea, button, datalist {
@@ -148,7 +163,7 @@
 
     input:focus, select:focus, textarea:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+      box-shadow: 0 0 0 3px rgba(13, 46, 20, 0.2);
       outline: none;
     }
 
@@ -170,7 +185,7 @@
 
     button:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
     }
 
     button:active {
@@ -178,37 +193,40 @@
     }
 
     .btn-primary {
-      background: linear-gradient(to right, #1a5f7f, #2c3e50);
+      background: linear-gradient(to right, var(--primary), var(--secondary));
       color: white;
+      border: 1px solid var(--gold);
     }
 
     .btn-primary:hover {
-      background: linear-gradient(to right, #2c3e50, #1a5f7f);
+      background: linear-gradient(to right, var(--secondary), var(--primary));
     }
 
     .btn-secondary {
-      background: linear-gradient(to right, var(--secondary), #27ae60);
+      background: linear-gradient(to right, var(--accent), #27ae60);
       color: white;
     }
 
     .btn-secondary:hover {
-      background: linear-gradient(to right, #27ae60, var(--secondary));
+      background: linear-gradient(to right, #27ae60, var(--accent));
     }
 
     .btn-scan {
-      background: linear-gradient(to right, #8e44ad, #6c3483);
+      background: linear-gradient(to right, #5a3d8a, #4a2c7a);
       color: white;
       margin-bottom: 20px;
+      border: 1px solid #7d5ba6;
     }
 
     .btn-scan:hover {
-      background: linear-gradient(to right, #6c3483, #8e44ad);
+      background: linear-gradient(to right, #4a2c7a, #5a3d8a);
     }
     
     .btn-stop {
       background: linear-gradient(to right, #e74c3c, #c0392b);
       color: white;
       margin-bottom: 20px;
+      border: 1px solid #e88a7f;
     }
 
     .btn-stop:hover {
@@ -227,9 +245,9 @@
     }
 
     #respon {
-      background-color: rgba(46, 204, 113, 0.15);
-      border: 2px solid var(--secondary);
-      color: #27ae60;
+      background-color: rgba(74, 156, 95, 0.15);
+      border: 2px solid var(--accent);
+      color: #1d5d3a;
     }
 
     #respon.error {
@@ -245,7 +263,7 @@
     }
 
     #rekap {
-      background-color: rgba(52, 152, 219, 0.1);
+      background-color: rgba(13, 46, 20, 0.1);
       border: 2px solid var(--primary);
       color: var(--dark);
     }
@@ -267,7 +285,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      display: none; /* Awalnya disembunyikan */
+      display: none;
     }
 
     .qr-placeholder {
@@ -287,11 +305,15 @@
       margin: 25px 0 15px;
       padding-bottom: 10px;
       border-bottom: 2px solid var(--light);
-      color: var(--dark);
+      color: var(--primary);
       font-weight: 600;
       display: flex;
       align-items: center;
       gap: 10px;
+    }
+
+    .section-title i {
+      color: var(--gold);
     }
 
     .hidden {
@@ -299,17 +321,17 @@
     }
 
     .footer {
+      background: linear-gradient(to right, var(--primary), var(--secondary));
       text-align: center;
       padding: 20px;
-      color: var(--dark);
+      color: white;
       font-size: 1.2rem;
-      background: linear-gradient(to right, #1a5f7f, #2c3e50);
-      border-top: 1px solid #eee;
+      border-top: 2px solid var(--gold);
       font-family: 'Dancing Script', cursive;
     }
 
     .footer-text {
-      color: white;
+      color: var(--gold);
       font-size: 1.8rem;
       font-weight: bold;
       letter-spacing: 1px;
@@ -319,6 +341,19 @@
     .button-group {
       display: flex;
       gap: 10px;
+    }
+
+    /* Dekorasi Islami */
+    .islamic-pattern {
+      position: absolute;
+      width: 100%;
+      height: 20px;
+      background: 
+        repeating-linear-gradient(45deg, transparent, transparent 10px, var(--gold) 10px, var(--gold) 20px),
+        repeating-linear-gradient(-45deg, transparent, transparent 10px, var(--primary) 10px, var(--primary) 20px);
+      top: 0;
+      left: 0;
+      opacity: 0.7;
     }
 
     /* Responsive adjustments */
@@ -360,6 +395,7 @@
     @media (max-width: 480px) {
       body {
         padding: 10px;
+        background: linear-gradient(rgba(10, 24, 11, 0.95), rgba(10, 24, 11, 0.95));
       }
       
       .header {
@@ -392,6 +428,8 @@
 </head>
 <body>
   <div class="container">
+    <div class="islamic-pattern"></div>
+    
     <div class="header">
       <div class="logo-container">
         <div class="logo-frame">
