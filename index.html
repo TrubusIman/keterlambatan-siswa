@@ -94,10 +94,11 @@
     <img src="https://trubusiman.github.io/keterlambatan-siswa/IMG_20240513_104401_500.png" alt="Logo Trubus Iman" class="logo">
     <h2>Form Keterlambatan Siswa</h2>
 
-    <!-- Tombol Scan QR dan Reader -->
+    <!-- Tombol Scan QR dan Ganti Kamera -->
     <div style="text-align: center; margin-bottom: 20px;">
-      <button type="button" onclick="startScanner()">📷 Scan QR Siswa</button>
-      <div id="reader" style="width:100%;"></div>
+      <button type="button" onclick="startScanner()">📷 Mulai Scan QR</button>
+      <button type="button" onclick="gantiKamera()">🔄 Ganti Kamera</button>
+      <div id="reader" style="width:100%; margin-top: 10px;"></div>
     </div>
 
     <form id="form-keterlambatan">
@@ -134,8 +135,11 @@
     const rekap = document.getElementById("rekap");
     const dataUrl = "https://script.google.com/macros/s/AKfycbx7dMvGRUCXdLD4wUrC0ic05RC6OzUuvgGuyu-pa4aTdLxpmyoxRFwOOYbOoLA2mVI/exec";
     const rekapUrl = dataUrl;
+
     let semuaSiswa = [];
     let scanner;
+    let semuaKamera = [];
+    let indexKameraAktif = 0;
 
     fetch(dataUrl)
       .then(res => res.json())
@@ -210,40 +214,66 @@
 
     function startScanner() {
       const qrRegion = document.getElementById("reader");
-      qrRegion.innerHTML = ""; // Kosongkan terlebih dulu
+      qrRegion.innerHTML = "";
 
       if (scanner) {
         scanner.clear().catch(() => {});
       }
 
       scanner = new Html5Qrcode("reader");
+
       Html5Qrcode.getCameras().then(cameras => {
-        if (cameras && cameras.length) {
-          scanner.start(
-            cameras[0].id,
-            { fps: 10, qrbox: 250 },
-            qrCodeMessage => {
-              document.getElementById("search").value = qrCodeMessage;
-              filterNama();
-              setTimeout(() => {
-                const options = document.getElementById("nama").options;
-                if (options.length === 2) {
-                  options[1].selected = true;
-                  document.getElementById("nama").dispatchEvent(new Event("change"));
-                }
-              }, 300);
-              scanner.stop().then(() => {
-                qrRegion.innerHTML = "";
-              }).catch(console.error);
-            },
-            errorMessage => {
-              // opsional: console.log("QR Error:", errorMessage);
-            }
-          );
+        semuaKamera = cameras;
+        if (cameras.length === 0) {
+          alert("Tidak ada kamera ditemukan.");
+          return;
         }
+
+        indexKameraAktif = 0;
+        jalankanScannerDenganKameraAktif();
       }).catch(err => {
-        console.error("Tidak bisa mengakses kamera:", err);
-        alert("Tidak dapat mengakses kamera. Pastikan sudah diizinkan.");
+        console.error("Tidak bisa akses kamera:", err);
+        alert("Pastikan browser diizinkan akses kamera.");
+      });
+    }
+
+    function gantiKamera() {
+      if (!semuaKamera.length) return;
+      indexKameraAktif = (indexKameraAktif + 1) % semuaKamera.length;
+      jalankanScannerDenganKameraAktif();
+    }
+
+    function jalankanScannerDenganKameraAktif() {
+      const qrRegion = document.getElementById("reader");
+      qrRegion.innerHTML = "";
+
+      if (!scanner) {
+        scanner = new Html5Qrcode("reader");
+      }
+
+      scanner.stop().catch(() => {}).finally(() => {
+        const kameraId = semuaKamera[indexKameraAktif].id;
+        scanner.start(
+          kameraId,
+          { fps: 10, qrbox: 250 },
+          qrCodeMessage => {
+            document.getElementById("search").value = qrCodeMessage;
+            filterNama();
+            setTimeout(() => {
+              const options = document.getElementById("nama").options;
+              if (options.length === 2) {
+                options[1].selected = true;
+                document.getElementById("nama").dispatchEvent(new Event("change"));
+              }
+            }, 300);
+            scanner.stop().then(() => {
+              qrRegion.innerHTML = "";
+            }).catch(console.error);
+          },
+          errorMessage => {
+            // opsional: console.log("Scan error:", errorMessage);
+          }
+        );
       });
     }
   </script>
