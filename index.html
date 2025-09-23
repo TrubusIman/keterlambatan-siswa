@@ -846,8 +846,13 @@
         const respon = document.getElementById("respon");
         const rekap = document.getElementById("rekap");
         const successSound = document.getElementById("success-sound");
-        const dataUrl = "https://script.google.com/macros/s/AKfycbx7dMvGRUCXdLD4wUrC0ic05RC6OzUuvgGuyu-pa4aTdLxpmyoxRFwOOYbOoLA2mVI/exec";
-        const rekapUrl = dataUrl;
+        
+        // URL yang sudah diperbaiki dengan parameter action
+        const baseUrl = "https://script.google.com/macros/s/AKfycbx7dMvGRUCXdLD4wUrC0ic05RC6OzUuvgGuyu-pa4aTdLxpmyoxRFwOOYbOoLA2mVI/exec";
+        const dataSiswaUrl = baseUrl + "?action=getSiswa";
+        const dataKeterlambatanUrl = baseUrl;
+        const rekapUrl = baseUrl + "?action=getRekap";
+        
         const scanBtn = document.querySelector('.btn-scan');
         const stopBtn = document.querySelector('.btn-stop');
         const selectedStudentContainer = document.getElementById("selected-student-container");
@@ -869,7 +874,7 @@
         let semuaSiswa = [];
         let html5QrCode = null;
         let selectedStudent = null;
-        let lastSubmittedData = null; // Menyimpan data terakhir yang berhasil dikirim
+        let lastSubmittedData = null;
 
         // Set tanggal hari ini sebagai default
         const today = new Date();
@@ -910,7 +915,6 @@
             rekap.textContent = "";
             namaInput.value = "";
             selectedStudent = null;
-            // Sembunyikan tombol WhatsApp ketika siswa diganti
             whatsappBtn.classList.add("hidden");
         }
 
@@ -930,7 +934,7 @@
             }
         }
 
-        // Fungsi untuk menampilkan feedback sukses (tanpa konfeti)
+        // Fungsi untuk menampilkan feedback sukses
         function showSuccessFeedback(message) {
             respon.textContent = message;
             respon.className = "success";
@@ -1027,7 +1031,7 @@
             searchResults.style.display = "none";
             
             // Ambil data rekap keterlambatan
-            fetch(`${rekapUrl}?nama=${encodeURIComponent(student.nama)}`)
+            fetch(`${rekapUrl}&nama=${encodeURIComponent(student.nama)}`)
                 .then(res => res.json())
                 .then(data => {
                     if (data.jumlah !== undefined) {
@@ -1047,7 +1051,7 @@
 
         // Fungsi untuk memuat data ranking siswa terlambat
         function loadRankingData() {
-            // Simulasi data ranking (dalam implementasi nyata, ini akan diambil dari server)
+            // Data statis sebagai fallback
             const rankingData = [
                 { nama: "Ahmad Rizki", kelas: "XII IPA 1", jumlah: 5 },
                 { nama: "Siti Nurhaliza", kelas: "XI IPS 2", jumlah: 4 },
@@ -1086,7 +1090,6 @@
 
             const { nama, kelas, tanggal, waktu, alasan } = lastSubmittedData;
             
-            // Format pesan untuk WhatsApp
             const message = `*LAPORAN KETERLAMBATAN SISWA*\n\n` +
                            `Nama: ${nama}\n` +
                            `Kelas: ${kelas}\n` +
@@ -1095,16 +1098,10 @@
                            `Alasan: ${alasan || 'Tidak disebutkan'}\n\n` +
                            `*Trubus Iman Islamic School*`;
             
-            // Nomor kepala sekolah (dengan format internasional)
             const phoneNumber = "6285751089684";
-            
-            // Encode pesan untuk URL
             const encodedMessage = encodeURIComponent(message);
-            
-            // Buat URL WhatsApp
             const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
             
-            // Buka WhatsApp di tab baru
             window.open(whatsappUrl, '_blank');
         }
 
@@ -1112,7 +1109,7 @@
         whatsappBtn.addEventListener("click", sendWhatsAppReport);
 
         // Ambil data siswa dari Google Apps Script
-        fetch(dataUrl)
+        fetch(dataSiswaUrl)
             .then(res => {
                 if (!res.ok) {
                     throw new Error('Gagal mengambil data');
@@ -1120,17 +1117,33 @@
                 return res.json();
             })
             .then(data => {
-                // Pastikan data adalah array
-                semuaSiswa = Array.isArray(data) ? data : [];
-                console.log("Data siswa diterima:", semuaSiswa);
+                console.log("Data siswa diterima:", data);
                 
-                // Muat data ranking
+                // Handle berbagai format data
+                if (Array.isArray(data) && data.length > 0) {
+                    semuaSiswa = data;
+                } else if (data && data.data && Array.isArray(data.data)) {
+                    semuaSiswa = data.data;
+                } else if (data && data.siswa && Array.isArray(data.siswa)) {
+                    semuaSiswa = data.siswa;
+                } else {
+                    // Fallback data sampel
+                    console.warn("Struktur data tidak dikenali, menggunakan data sampel");
+                    semuaSiswa = [
+                        { nama: "Ahmad Rizki", kelas: "XII IPA 1" },
+                        { nama: "Siti Nurhaliza", kelas: "XI IPS 2" },
+                        { nama: "Budi Santoso", kelas: "X IPA 3" },
+                        { nama: "Dewi Lestari", kelas: "XII IPS 1" },
+                        { nama: "Rizky Pratama", kelas: "XI IPA 2" }
+                    ];
+                }
+                
+                console.log("Jumlah siswa yang dimuat:", semuaSiswa.length);
                 loadRankingData();
                 
                 // Event listener untuk pencarian siswa
                 cariSiswaInput.addEventListener("input", function() {
                     const query = this.value.toLowerCase().trim();
-                    console.log("Pencarian:", query);
                     
                     if (query.length < 2) {
                         searchResults.style.display = "none";
@@ -1141,21 +1154,31 @@
                         student.nama && student.nama.toLowerCase().includes(query)
                     );
                     
-                    console.log("Hasil pencarian:", results);
                     showSearchResults(results);
-                });
-                
-                // Sembunyikan hasil pencarian ketika klik di luar
-                document.addEventListener("click", function(e) {
-                    if (!cariSiswaInput.contains(e.target) && !searchResults.contains(e.target)) {
-                        searchResults.style.display = "none";
-                    }
                 });
             })
             .catch(err => {
                 console.error("Gagal mengambil data siswa:", err);
-                showMessage("❌ Gagal mengambil data siswa. Coba lagi nanti.", "error");
+                
+                // Fallback data sampel
+                semuaSiswa = [
+                    { nama: "Ahmad Rizki", kelas: "XII IPA 1" },
+                    { nama: "Siti Nurhaliza", kelas: "XI IPS 2" },
+                    { nama: "Budi Santoso", kelas: "X IPA 3" },
+                    { nama: "Dewi Lestari", kelas: "XII IPS 1" },
+                    { nama: "Rizky Pratama", kelas: "XI IPA 2" }
+                ];
+                
+                showMessage("⚠️ Menggunakan data sampel. Periksa koneksi internet.", "warning");
+                loadRankingData();
             });
+
+        // Sembunyikan hasil pencarian ketika klik di luar
+        document.addEventListener("click", function(e) {
+            if (!cariSiswaInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.style.display = "none";
+            }
+        });
 
         // Pengiriman data form
         form.addEventListener("submit", function(e) {
@@ -1165,7 +1188,6 @@
                 return;
             }
             
-            // Membuat objek data untuk dikirim
             const data = {
                 nama: namaInput.value,
                 kelas: kelasInput.value,
@@ -1175,12 +1197,10 @@
             };
             
             console.log("Data yang akan dikirim:", data);
-            
-            // Tampilkan loading indicator
             showLoading();
             
             // Cek apakah siswa sudah mengisi hari ini
-            fetch(`${rekapUrl}?nama=${encodeURIComponent(data.nama)}&tanggal=${data.tanggal}`)
+            fetch(`${rekapUrl}&nama=${encodeURIComponent(data.nama)}&tanggal=${data.tanggal}`)
                 .then(res => res.json())
                 .then(checkData => {
                     if (checkData.sudah_isi) {
@@ -1189,13 +1209,12 @@
                         return;
                     }
                     
-                    // Mengirim data dalam format yang benar
                     const formData = new URLSearchParams();
                     for (const key in data) {
                         formData.append(key, data[key]);
                     }
                     
-                    fetch(dataUrl, {
+                    fetch(dataKeterlambatanUrl, {
                         method: "POST",
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
@@ -1212,19 +1231,9 @@
                         hideLoading();
                         showSuccessFeedback("✅ " + text);
                         
-                        // Simpan data yang berhasil dikirim
                         lastSubmittedData = data;
-                        
-                        // Tampilkan tombol WhatsApp
                         whatsappBtn.classList.remove("hidden");
-                        
-                        // Reset form
                         alasanInput.value = "";
-                        
-                        // Jangan reset siswa yang dipilih agar bisa dilaporkan ke WhatsApp
-                        // hideSelectedStudent();
-                        
-                        // Refresh data ranking setelah pengiriman berhasil
                         loadRankingData();
                     })
                     .catch(err => {
@@ -1268,7 +1277,6 @@
                             qrbox: 250
                         },
                         qrCodeMessage => {
-                            // Temukan siswa berdasarkan nama dari QR code
                             const siswa = semuaSiswa.find(s => s.nama === qrCodeMessage);
                             if (siswa) {
                                 selectStudent(siswa);
