@@ -232,17 +232,6 @@
             background: linear-gradient(to right, #c0392b, #e74c3c);
         }
 
-        .btn-whatsapp {
-            background: linear-gradient(to right, #25d366, #128c7e);
-            color: white;
-            margin-top: 15px;
-            border: 1px solid #2ed158;
-        }
-
-        .btn-whatsapp:hover {
-            background: linear-gradient(to right, #128c7e, #25d366);
-        }
-
         #respon, #rekap {
             padding: 15px;
             border-radius: 8px;
@@ -518,98 +507,6 @@
             font-size: 0.9rem;
         }
 
-        /* Tampilan ranking siswa terlambat */
-        .ranking-container {
-            background-color: rgba(13, 46, 20, 0.05);
-            border-radius: 8px;
-            padding: 15px;
-            margin: 20px 0;
-            border: 1px solid rgba(13, 46, 20, 0.1);
-        }
-
-        .ranking-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 15px;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .ranking-title i {
-            color: var(--gold);
-        }
-
-        .ranking-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .ranking-item {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            background-color: white;
-            border-radius: 6px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-        }
-
-        .ranking-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .ranking-number {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            margin-right: 15px;
-            flex-shrink: 0;
-        }
-
-        .ranking-number.rank-1 {
-            background: linear-gradient(to right, #ffd700, #ffa500);
-        }
-
-        .ranking-number.rank-2 {
-            background: linear-gradient(to right, #c0c0c0, #a0a0a0);
-        }
-
-        .ranking-number.rank-3 {
-            background: linear-gradient(to right, #cd7f32, #a0522d);
-        }
-
-        .ranking-info {
-            flex-grow: 1;
-        }
-
-        .ranking-name {
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 3px;
-        }
-
-        .ranking-details {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-            color: var(--secondary);
-        }
-
-        .ranking-count {
-            font-weight: 700;
-            color: var(--danger);
-        }
-
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .container {
@@ -641,9 +538,6 @@
                 flex-direction: column;
                 text-align: center;
                 gap: 10px;
-            }
-            .ranking-details {
-                flex-direction: column;
             }
         }
 
@@ -782,51 +676,7 @@
                 <button type="submit" class="btn-primary" id="submit-btn">
                     <i class="fas fa-paper-plane"></i> Kirim Data
                 </button>
-                
-                <!-- Tombol WhatsApp - akan muncul setelah data berhasil dikirim -->
-                <button type="button" class="btn-whatsapp hidden" id="whatsapp-btn">
-                    <i class="fab fa-whatsapp"></i> Laporkan ke Kepala Sekolah
-                </button>
             </form>
-            
-            <!-- Peringkat keterlambatan dipindahkan ke bawah form -->
-            <div class="ranking-container">
-                <div class="ranking-title">
-                    <i class="fas fa-exclamation-triangle"></i> 3 Siswa Terlambat Paling Sering
-                </div>
-                <div class="ranking-list" id="ranking-list">
-                    <div class="ranking-item">
-                        <div class="ranking-number rank-1">1</div>
-                        <div class="ranking-info">
-                            <div class="ranking-name">Memuat data...</div>
-                            <div class="ranking-details">
-                                <span class="ranking-class">-</span>
-                                <span class="ranking-count">0 kali</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ranking-item">
-                        <div class="ranking-number rank-2">2</div>
-                        <div class="ranking-info">
-                            <div class="ranking-name">Memuat data...</div>
-                            <div class="ranking-details">
-                                <span class="ranking-class">-</span>
-                                <span class="ranking-count">0 kali</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ranking-item">
-                        <div class="ranking-number rank-3">3</div>
-                        <div class="ranking-info">
-                            <div class="ranking-name">Memuat data...</div>
-                            <div class="ranking-details">
-                                <span class="ranking-class">-</span>
-                                <span class="ranking-count">0 kali</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
             
             <div id="rekap"></div>
             <div id="respon"></div>
@@ -846,13 +696,8 @@
         const respon = document.getElementById("respon");
         const rekap = document.getElementById("rekap");
         const successSound = document.getElementById("success-sound");
-        
-        // URL yang sudah diperbaiki dengan parameter action
-        const baseUrl = "https://script.google.com/macros/s/AKfycbx7dMvGRUCXdLD4wUrC0ic05RC6OzUuvgGuyu-pa4aTdLxpmyoxRFwOOYbOoLA2mVI/exec";
-        const dataSiswaUrl = baseUrl + "?action=getSiswa";
-        const dataKeterlambatanUrl = baseUrl;
-        const rekapUrl = baseUrl + "?action=getRekap";
-        
+        const dataUrl = "https://script.google.com/macros/s/AKfycbx7dMvGRUCXdLD4wUrC0ic05RC6OzUuvgGuyu-pa4aTdLxpmyoxRFwOOYbOoLA2mVI/exec";
+        const rekapUrl = dataUrl;
         const scanBtn = document.querySelector('.btn-scan');
         const stopBtn = document.querySelector('.btn-stop');
         const selectedStudentContainer = document.getElementById("selected-student-container");
@@ -868,13 +713,10 @@
         const searchResults = document.getElementById("search-results");
         const loadingOverlay = document.getElementById("loading-overlay");
         const submitBtn = document.getElementById("submit-btn");
-        const rankingList = document.getElementById("ranking-list");
-        const whatsappBtn = document.getElementById("whatsapp-btn");
         
         let semuaSiswa = [];
         let html5QrCode = null;
         let selectedStudent = null;
-        let lastSubmittedData = null;
 
         // Set tanggal hari ini sebagai default
         const today = new Date();
@@ -915,7 +757,6 @@
             rekap.textContent = "";
             namaInput.value = "";
             selectedStudent = null;
-            whatsappBtn.classList.add("hidden");
         }
 
         // Event listener untuk tombol ganti siswa
@@ -934,7 +775,7 @@
             }
         }
 
-        // Fungsi untuk menampilkan feedback sukses
+        // Fungsi untuk menampilkan feedback sukses (tanpa konfeti)
         function showSuccessFeedback(message) {
             respon.textContent = message;
             respon.className = "success";
@@ -1031,7 +872,7 @@
             searchResults.style.display = "none";
             
             // Ambil data rekap keterlambatan
-            fetch(`${rekapUrl}&nama=${encodeURIComponent(student.nama)}`)
+            fetch(`${rekapUrl}?nama=${encodeURIComponent(student.nama)}`)
                 .then(res => res.json())
                 .then(data => {
                     if (data.jumlah !== undefined) {
@@ -1049,67 +890,8 @@
                 });
         }
 
-        // Fungsi untuk memuat data ranking siswa terlambat
-        function loadRankingData() {
-            // Data statis sebagai fallback
-            const rankingData = [
-                { nama: "Ahmad Rizki", kelas: "XII IPA 1", jumlah: 5 },
-                { nama: "Siti Nurhaliza", kelas: "XI IPS 2", jumlah: 4 },
-                { nama: "Budi Santoso", kelas: "X IPA 3", jumlah: 3 }
-            ];
-            
-            // Update tampilan ranking
-            rankingList.innerHTML = "";
-            
-            rankingData.forEach((student, index) => {
-                const rankClass = `rank-${index + 1}`;
-                
-                const rankingItem = document.createElement("div");
-                rankingItem.className = "ranking-item";
-                rankingItem.innerHTML = `
-                    <div class="ranking-number ${rankClass}">${index + 1}</div>
-                    <div class="ranking-info">
-                        <div class="ranking-name">${student.nama}</div>
-                        <div class="ranking-details">
-                            <span class="ranking-class">${student.kelas}</span>
-                            <span class="ranking-count">${student.jumlah} kali</span>
-                        </div>
-                    </div>
-                `;
-                
-                rankingList.appendChild(rankingItem);
-            });
-        }
-
-        // Fungsi untuk mengirim laporan ke WhatsApp
-        function sendWhatsAppReport() {
-            if (!lastSubmittedData) {
-                showMessage("❌ Tidak ada data yang dapat dilaporkan", "error");
-                return;
-            }
-
-            const { nama, kelas, tanggal, waktu, alasan } = lastSubmittedData;
-            
-            const message = `*LAPORAN KETERLAMBATAN SISWA*\n\n` +
-                           `Nama: ${nama}\n` +
-                           `Kelas: ${kelas}\n` +
-                           `Tanggal: ${tanggal}\n` +
-                           `Waktu: ${waktu}\n` +
-                           `Alasan: ${alasan || 'Tidak disebutkan'}\n\n` +
-                           `*Trubus Iman Islamic School*`;
-            
-            const phoneNumber = "6285751089684";
-            const encodedMessage = encodeURIComponent(message);
-            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-            
-            window.open(whatsappUrl, '_blank');
-        }
-
-        // Event listener untuk tombol WhatsApp
-        whatsappBtn.addEventListener("click", sendWhatsAppReport);
-
         // Ambil data siswa dari Google Apps Script
-        fetch(dataSiswaUrl)
+        fetch(dataUrl)
             .then(res => {
                 if (!res.ok) {
                     throw new Error('Gagal mengambil data');
@@ -1117,33 +899,14 @@
                 return res.json();
             })
             .then(data => {
-                console.log("Data siswa diterima:", data);
-                
-                // Handle berbagai format data
-                if (Array.isArray(data) && data.length > 0) {
-                    semuaSiswa = data;
-                } else if (data && data.data && Array.isArray(data.data)) {
-                    semuaSiswa = data.data;
-                } else if (data && data.siswa && Array.isArray(data.siswa)) {
-                    semuaSiswa = data.siswa;
-                } else {
-                    // Fallback data sampel
-                    console.warn("Struktur data tidak dikenali, menggunakan data sampel");
-                    semuaSiswa = [
-                        { nama: "Ahmad Rizki", kelas: "XII IPA 1" },
-                        { nama: "Siti Nurhaliza", kelas: "XI IPS 2" },
-                        { nama: "Budi Santoso", kelas: "X IPA 3" },
-                        { nama: "Dewi Lestari", kelas: "XII IPS 1" },
-                        { nama: "Rizky Pratama", kelas: "XI IPA 2" }
-                    ];
-                }
-                
-                console.log("Jumlah siswa yang dimuat:", semuaSiswa.length);
-                loadRankingData();
+                // Pastikan data adalah array
+                semuaSiswa = Array.isArray(data) ? data : [];
+                console.log("Data siswa diterima:", semuaSiswa);
                 
                 // Event listener untuk pencarian siswa
                 cariSiswaInput.addEventListener("input", function() {
                     const query = this.value.toLowerCase().trim();
+                    console.log("Pencarian:", query);
                     
                     if (query.length < 2) {
                         searchResults.style.display = "none";
@@ -1154,31 +917,21 @@
                         student.nama && student.nama.toLowerCase().includes(query)
                     );
                     
+                    console.log("Hasil pencarian:", results);
                     showSearchResults(results);
+                });
+                
+                // Sembunyikan hasil pencarian ketika klik di luar
+                document.addEventListener("click", function(e) {
+                    if (!cariSiswaInput.contains(e.target) && !searchResults.contains(e.target)) {
+                        searchResults.style.display = "none";
+                    }
                 });
             })
             .catch(err => {
                 console.error("Gagal mengambil data siswa:", err);
-                
-                // Fallback data sampel
-                semuaSiswa = [
-                    { nama: "Ahmad Rizki", kelas: "XII IPA 1" },
-                    { nama: "Siti Nurhaliza", kelas: "XI IPS 2" },
-                    { nama: "Budi Santoso", kelas: "X IPA 3" },
-                    { nama: "Dewi Lestari", kelas: "XII IPS 1" },
-                    { nama: "Rizky Pratama", kelas: "XI IPA 2" }
-                ];
-                
-                showMessage("⚠️ Menggunakan data sampel. Periksa koneksi internet.", "warning");
-                loadRankingData();
+                showMessage("❌ Gagal mengambil data siswa. Coba lagi nanti.", "error");
             });
-
-        // Sembunyikan hasil pencarian ketika klik di luar
-        document.addEventListener("click", function(e) {
-            if (!cariSiswaInput.contains(e.target) && !searchResults.contains(e.target)) {
-                searchResults.style.display = "none";
-            }
-        });
 
         // Pengiriman data form
         form.addEventListener("submit", function(e) {
@@ -1188,6 +941,7 @@
                 return;
             }
             
+            // Membuat objek data untuk dikirim
             const data = {
                 nama: namaInput.value,
                 kelas: kelasInput.value,
@@ -1197,10 +951,12 @@
             };
             
             console.log("Data yang akan dikirim:", data);
+            
+            // Tampilkan loading indicator
             showLoading();
             
             // Cek apakah siswa sudah mengisi hari ini
-            fetch(`${rekapUrl}&nama=${encodeURIComponent(data.nama)}&tanggal=${data.tanggal}`)
+            fetch(`${rekapUrl}?nama=${encodeURIComponent(data.nama)}&tanggal=${data.tanggal}`)
                 .then(res => res.json())
                 .then(checkData => {
                     if (checkData.sudah_isi) {
@@ -1209,12 +965,13 @@
                         return;
                     }
                     
+                    // Mengirim data dalam format yang benar
                     const formData = new URLSearchParams();
                     for (const key in data) {
                         formData.append(key, data[key]);
                     }
                     
-                    fetch(dataKeterlambatanUrl, {
+                    fetch(dataUrl, {
                         method: "POST",
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
@@ -1231,10 +988,9 @@
                         hideLoading();
                         showSuccessFeedback("✅ " + text);
                         
-                        lastSubmittedData = data;
-                        whatsappBtn.classList.remove("hidden");
+                        // Reset form
                         alasanInput.value = "";
-                        loadRankingData();
+                        hideSelectedStudent();
                     })
                     .catch(err => {
                         hideLoading();
@@ -1277,6 +1033,7 @@
                             qrbox: 250
                         },
                         qrCodeMessage => {
+                            // Temukan siswa berdasarkan nama dari QR code
                             const siswa = semuaSiswa.find(s => s.nama === qrCodeMessage);
                             if (siswa) {
                                 selectStudent(siswa);
